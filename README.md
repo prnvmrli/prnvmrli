@@ -26,7 +26,7 @@ My work revolves around:
 
 <div align="center">
 
-<img src="https://skillicons.dev/icons?i=flutter,dart,react,js,python,git,github,firebase,sqlite,docker" />
+<img src="https://skillicons.dev/icons?i=flutter,dart,react,js,python,git,github,firebase,sqlite" />
 
 </div>
 
