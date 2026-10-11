@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,7 +19,6 @@ class _PortfolioPageState extends State<PortfolioPage> {
   bool _showStickyIdentity = false;
 
   final GlobalKey _heroKey = GlobalKey();
-  final GlobalKey _workKey = GlobalKey();
   final GlobalKey _experienceKey = GlobalKey();
   final GlobalKey _contactKey = GlobalKey();
 
@@ -124,7 +124,8 @@ class _PortfolioPageState extends State<PortfolioPage> {
                           _HeroSection(
                             key: _heroKey,
                             isMobile: isMobile,
-                            onScrollToWork: () => _scrollTo(_workKey),
+                            onScrollToExperience: () =>
+                                _scrollTo(_experienceKey),
                             onScrollToContact: () => _scrollTo(_contactKey),
                             onOpenGitHub: () => _openUrl(githubUrl),
                             onEmail: () => _openUrl('mailto:$email'),
@@ -132,16 +133,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
 
                           const SizedBox(height: 80),
 
-                          // 01: Selected Systems Work
-                          _SelectedWorkSection(
-                            key: _workKey,
-                            isMobile: isMobile,
-                            onOpenUrl: _openUrl,
-                          ),
-
-                          const SizedBox(height: 80),
-
-                          // 02: Experience
+                          // 01: Experience & Systems
                           _ExperienceSection(
                             key: _experienceKey,
                             isMobile: isMobile,
@@ -149,7 +141,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
 
                           const SizedBox(height: 80),
 
-                          // 03: Contact & Closing
+                          // 02: Contact & Closing
                           _ContactSection(
                             key: _contactKey,
                             onCopyEmail: () => _copyEmail(context),
@@ -179,7 +171,6 @@ class _PortfolioPageState extends State<PortfolioPage> {
             child: _StickyHeader(
               showIdentity: _showStickyIdentity,
               onScrollToTop: () => _scrollTo(_heroKey),
-              onScrollToWork: () => _scrollTo(_workKey),
               onScrollToExperience: () => _scrollTo(_experienceKey),
               onScrollToContact: () => _scrollTo(_contactKey),
             ),
@@ -196,14 +187,12 @@ class _PortfolioPageState extends State<PortfolioPage> {
 class _StickyHeader extends StatelessWidget {
   final bool showIdentity;
   final VoidCallback onScrollToTop;
-  final VoidCallback onScrollToWork;
   final VoidCallback onScrollToExperience;
   final VoidCallback onScrollToContact;
 
   const _StickyHeader({
     required this.showIdentity,
     required this.onScrollToTop,
-    required this.onScrollToWork,
     required this.onScrollToExperience,
     required this.onScrollToContact,
   });
@@ -229,7 +218,6 @@ class _StickyHeader extends StatelessWidget {
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final showSubtitle = constraints.maxWidth >= 760;
-                    final showExperience = constraints.maxWidth >= 480;
 
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -251,8 +239,9 @@ class _StickyHeader extends StatelessWidget {
                                 onTap: onScrollToTop,
                                 borderRadius: BorderRadius.circular(4),
                                 child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                  ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -274,7 +263,8 @@ class _StickyHeader extends StatelessWidget {
                                           width: 1,
                                           color: Palette.border,
                                           margin: const EdgeInsets.symmetric(
-                                              horizontal: 10),
+                                            horizontal: 10,
+                                          ),
                                         ),
                                         const Text(
                                           'Mobile Systems Engineer',
@@ -297,15 +287,13 @@ class _StickyHeader extends StatelessWidget {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            _NavLink('Work', onTap: onScrollToWork),
-                            const SizedBox(width: 14),
-                            if (showExperience) ...[
-                              _NavLink('Experience',
-                                  onTap: onScrollToExperience),
-                              const SizedBox(width: 14),
-                            ],
-                            _NavLink('Contact →',
-                                onTap: onScrollToContact, isPrimary: true),
+                            _NavLink('Experience', onTap: onScrollToExperience),
+                            const SizedBox(width: 16),
+                            _NavLink(
+                              'Contact →',
+                              onTap: onScrollToContact,
+                              isPrimary: true,
+                            ),
                           ],
                         ),
                       ],
@@ -337,10 +325,12 @@ class _NavLinkState extends State<_NavLink> {
 
   @override
   Widget build(BuildContext context) {
-    final defaultColor =
-        widget.isPrimary ? Palette.accent : Palette.textSecondary;
-    final hoverColor =
-        widget.isPrimary ? Palette.accentInteractive : Palette.textPrimary;
+    final defaultColor = widget.isPrimary
+        ? Palette.accent
+        : Palette.textSecondary;
+    final hoverColor = widget.isPrimary
+        ? Palette.accentInteractive
+        : Palette.textPrimary;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -367,7 +357,7 @@ class _NavLinkState extends State<_NavLink> {
 // ---------------------------------------------------------------------------
 class _HeroSection extends StatelessWidget {
   final bool isMobile;
-  final VoidCallback onScrollToWork;
+  final VoidCallback onScrollToExperience;
   final VoidCallback onScrollToContact;
   final VoidCallback onOpenGitHub;
   final VoidCallback onEmail;
@@ -375,7 +365,7 @@ class _HeroSection extends StatelessWidget {
   const _HeroSection({
     super.key,
     required this.isMobile,
-    required this.onScrollToWork,
+    required this.onScrollToExperience,
     required this.onScrollToContact,
     required this.onOpenGitHub,
     required this.onEmail,
@@ -459,8 +449,10 @@ class _HeroSection extends StatelessWidget {
                   ],
                   const SizedBox(height: 6),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Palette.surfaceContainer,
                       border: Border.all(color: Palette.border),
@@ -470,7 +462,9 @@ class _HeroSection extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         StatusPulseDot(
-                            color: Palette.statusAvailable, size: 6.0),
+                          color: Palette.statusAvailable,
+                          size: 6.0,
+                        ),
                         SizedBox(width: 6),
                         Text(
                           'Available for select engineering contracts',
@@ -596,22 +590,13 @@ class _HeroSection extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             _TextLink(
-              label: 'View Selected Work ↓',
+              label: 'View Experience & Systems ↓',
               highlight: true,
-              onTap: onScrollToWork,
+              onTap: onScrollToExperience,
             ),
-            _TextLink(
-              label: 'Get in touch →',
-              onTap: onScrollToContact,
-            ),
-            _TextLink(
-              label: 'GitHub ↗',
-              onTap: onOpenGitHub,
-            ),
-            _TextLink(
-              label: 'Email ↗',
-              onTap: onEmail,
-            ),
+            _TextLink(label: 'Get in touch →', onTap: onScrollToContact),
+            _TextLink(label: 'GitHub ↗', onTap: onOpenGitHub),
+            _TextLink(label: 'Email ↗', onTap: onEmail),
           ],
         ),
       ],
@@ -620,198 +605,12 @@ class _HeroSection extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 01: Selected Systems Work
-// ---------------------------------------------------------------------------
-class _SelectedWorkSection extends StatelessWidget {
-  final bool isMobile;
-  final void Function(String url) onOpenUrl;
-
-  const _SelectedWorkSection({
-    super.key,
-    required this.isMobile,
-    required this.onOpenUrl,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SectionHeader(
-          title: 'Selected Systems Work',
-          indexTag: '01 / Production',
-        ),
-        const SizedBox(height: 36),
-        for (int i = 0; i < projects.length; i++) ...[
-          _ProjectArticle(
-            project: projects[i],
-            isMobile: isMobile,
-            onOpenUrl: onOpenUrl,
-          ),
-          if (i < projects.length - 1) const SizedBox(height: 52),
-        ],
-      ],
-    );
-  }
-}
-
-class _ProjectArticle extends StatelessWidget {
-  final Project project;
-  final bool isMobile;
-  final void Function(String url) onOpenUrl;
-
-  const _ProjectArticle({
-    required this.project,
-    required this.isMobile,
-    required this.onOpenUrl,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Title & Metric Tag
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Expanded(
-              child: Text(
-                project.title,
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 19,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.3,
-                  color: Palette.textPrimary,
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              project.tag,
-              style: const TextStyle(
-                fontFamily: 'JetBrains Mono',
-                fontSize: 12,
-                color: Palette.accent,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 12),
-
-        // Description
-        Text(
-          project.description,
-          style: const TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 14,
-            fontWeight: FontWeight.w300,
-            color: Palette.textSecondary,
-            height: 1.6,
-          ),
-        ),
-
-        const SizedBox(height: 14),
-
-        // Challenge & Architecture side-border block
-        Container(
-          padding: const EdgeInsets.only(left: 14),
-          decoration: const BoxDecoration(
-            border: Border(
-              left: BorderSide(color: Palette.border, width: 2.0),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RichText(
-                text: TextSpan(
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 12,
-                    color: Palette.outline,
-                    height: 1.55,
-                  ),
-                  children: [
-                    const TextSpan(
-                      text: 'Challenge: ',
-                      style: TextStyle(
-                        color: Palette.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    TextSpan(text: project.challenge),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 6),
-              RichText(
-                text: TextSpan(
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 12,
-                    color: Palette.outline,
-                    height: 1.55,
-                  ),
-                  children: [
-                    const TextSpan(
-                      text: 'Architecture: ',
-                      style: TextStyle(
-                        color: Palette.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    TextSpan(text: project.architecture),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 14),
-
-        // Stack & Link Footer
-        Wrap(
-          alignment: WrapAlignment.spaceBetween,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 16,
-          runSpacing: 8,
-          children: [
-            Text(
-              project.techStack.join(' · '),
-              style: const TextStyle(
-                fontFamily: 'JetBrains Mono',
-                fontSize: 11,
-                color: Palette.outline,
-              ),
-            ),
-            _TextLink(
-              label: 'View on GitHub ↗',
-              onTap: () => onOpenUrl(project.link),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// 02: Experience
+// 01: Experience & Systems
 // ---------------------------------------------------------------------------
 class _ExperienceSection extends StatelessWidget {
   final bool isMobile;
 
-  const _ExperienceSection({
-    super.key,
-    required this.isMobile,
-  });
+  const _ExperienceSection({super.key, required this.isMobile});
 
   @override
   Widget build(BuildContext context) {
@@ -820,7 +619,7 @@ class _ExperienceSection extends StatelessWidget {
       children: [
         const SectionHeader(
           title: 'Experience',
-          indexTag: '02 / Trajectory',
+          indexTag: '01 / Trajectory & Systems',
         ),
         const SizedBox(height: 32),
         for (final job in jobs) ...[
@@ -880,10 +679,7 @@ class _ExperienceSection extends StatelessWidget {
                     children: [
                       const Text(
                         '• ',
-                        style: TextStyle(
-                          color: Palette.accent,
-                          fontSize: 13,
-                        ),
+                        style: TextStyle(color: Palette.accent, fontSize: 13),
                       ),
                       Expanded(
                         child: Text(
@@ -901,6 +697,183 @@ class _ExperienceSection extends StatelessWidget {
                   ),
                 ),
               ],
+
+              // Key Platforms & Systems Delivered (IOURING Projects)
+              if (job.platforms.isNotEmpty) ...[
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Container(
+                      width: 5,
+                      height: 5,
+                      decoration: const BoxDecoration(
+                        color: Palette.accent,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'KEY PLATFORMS & PRODUCTION CLIENTS',
+                      style: TextStyle(
+                        fontFamily: 'JetBrains Mono',
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.6,
+                        color: Palette.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                for (final platform in job.platforms)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 14),
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: Palette.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Palette.borderLight),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Title & Tag
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                platform.title,
+                                style: const TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: -0.2,
+                                  color: Palette.textPrimary,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              platform.tag,
+                              style: const TextStyle(
+                                fontFamily: 'JetBrains Mono',
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: Palette.accent,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+
+                        // Description
+                        Text(
+                          platform.description,
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 13,
+                            fontWeight: FontWeight.w300,
+                            color: Palette.textSecondary,
+                            height: 1.55,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Challenge & Architecture callout
+                        Container(
+                          padding: const EdgeInsets.only(left: 12),
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              left: BorderSide(
+                                color: Palette.border,
+                                width: 2.0,
+                              ),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 12,
+                                    color: Palette.outline,
+                                    height: 1.5,
+                                  ),
+                                  children: [
+                                    const TextSpan(
+                                      text: 'Challenge: ',
+                                      style: TextStyle(
+                                        color: Palette.textSecondary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    TextSpan(text: platform.challenge),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              RichText(
+                                text: TextSpan(
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 12,
+                                    color: Palette.outline,
+                                    height: 1.5,
+                                  ),
+                                  children: [
+                                    const TextSpan(
+                                      text: 'Architecture: ',
+                                      style: TextStyle(
+                                        color: Palette.textSecondary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    TextSpan(text: platform.architecture),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Tech Stack Pills
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            for (final tech in platform.techStack)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Palette.surfaceContainer,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: Palette.border),
+                                ),
+                                child: Text(
+                                  tech,
+                                  style: const TextStyle(
+                                    fontFamily: 'JetBrains Mono',
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                    color: Palette.textSecondary,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
             ],
           ),
         ],
@@ -910,7 +883,7 @@ class _ExperienceSection extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 03: Contact & Closing
+// 02: Contact & Closing
 // ---------------------------------------------------------------------------
 class _ContactSection extends StatelessWidget {
   final VoidCallback onCopyEmail;
@@ -974,18 +947,9 @@ class _ContactSection extends StatelessWidget {
           runSpacing: 8,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            _TextLink(
-              label: 'GitHub ↗',
-              onTap: () => onOpenUrl(githubUrl),
-            ),
-            _TextLink(
-              label: 'LinkedIn ↗',
-              onTap: () => onOpenUrl(linkedinUrl),
-            ),
-            const Text(
-              '·',
-              style: TextStyle(color: Palette.outline),
-            ),
+            _TextLink(label: 'GitHub ↗', onTap: () => onOpenUrl(githubUrl)),
+            _TextLink(label: 'LinkedIn ↗', onTap: () => onOpenUrl(linkedinUrl)),
+            const Text('·', style: TextStyle(color: Palette.outline)),
             const Text(
               'Kerala, India (UTC +05:30)',
               style: TextStyle(
@@ -1012,9 +976,7 @@ class _Footer extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.only(top: 28),
       decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Palette.borderLight),
-        ),
+        border: Border(top: BorderSide(color: Palette.borderLight)),
       ),
       child: Wrap(
         alignment: WrapAlignment.spaceBetween,

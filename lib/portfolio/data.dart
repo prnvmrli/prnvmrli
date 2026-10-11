@@ -10,78 +10,37 @@ const aboutBio =
 const focusSummary =
     'Focus: Clean Architecture · BLoC & State Orchestration · Low-Latency WebSockets · Offline-First Caching';
 
-class Project {
+class PlatformProject {
   final String title;
   final String tag;
   final String description;
   final String challenge;
   final String architecture;
   final List<String> techStack;
-  final String link;
 
-  const Project({
+  const PlatformProject({
     required this.title,
     required this.tag,
     required this.description,
     required this.challenge,
     required this.architecture,
     required this.techStack,
-    required this.link,
   });
 }
-
-const projects = [
-  Project(
-    title: 'NxtOption — Options Trading Platform',
-    tag: 'Low-Latency WebSockets',
-    description:
-        'A dedicated options trading platform developed for its ReactJS web and Flutter mobile applications. Features an interactive Strategy Builder, Open Interest (OI) and Put-Call Ratio (PCR) analytics charts, and a client-tailored trading SDK.',
-    challenge:
-        'Handling high-frequency market tick feeds and real-time options payoff diagram recalculations without dropping UI frames.',
-    architecture:
-        'Implemented Clean Architecture with BLoC state orchestration across React web & Flutter mobile. Engineered resilient WebSocket streaming pipelines with deterministic reconnection lifecycles.',
-    techStack: [
-      'Flutter',
-      'ReactJS',
-      'Trading SDK',
-      'WebSockets',
-      'BLoC',
-      'Redux',
-    ],
-    link: 'https://github.com/prnvmrli',
-  ),
-  Project(
-    title: 'NxTrad — Equity Trading Client & Admin',
-    tag: 'Clean Architecture & Offline First',
-    description:
-        'A full-suite trading application supporting IPO workflows, automated deep-link URL navigation on screenshot detection, and payment gateway integration, alongside an admin console built with Flutter Web.',
-    challenge:
-        'Ensuring zero-latency portfolio lookups and instant view resumption under unstable mobile network conditions.',
-    architecture:
-        'Designed SQLite / Drift offline caching pipeline delivering instantaneous load times. Built automated screenshot detection routing and white-labeling capability from a single shared codebase.',
-    techStack: [
-      'Flutter',
-      'Flutter Web',
-      'Clean Architecture',
-      'BLoC',
-      'SQLite / Drift',
-      'Deep Linking',
-    ],
-    link: 'https://github.com/prnvmrli',
-  ),
-];
 
 class Job {
   final String role;
   final String company;
   final String period;
   final List<String> bulletPoints;
+  final List<PlatformProject> platforms;
 
   const Job({
     required this.role,
     required this.company,
     required this.period,
     required this.bulletPoints,
+    this.platforms = const [],
   });
 }
 
@@ -97,10 +56,41 @@ const jobs = [
       'Integrated SQLite with Drift for high-efficiency local data caching, enabling seamless offline resumption and sub-10ms queries.',
       'Delivered white-label solutions from a unified codebase, supporting distinct branding and multi-client deployments.',
     ],
+    platforms: [
+      PlatformProject(
+        title: 'NxtOption — Options Trading Platform',
+        tag: 'Low-Latency WebSockets',
+        description: 'A dedicated options trading platform developed at IOURING for ReactJS web and Flutter mobile applications. Features an interactive Strategy Builder, Open Interest (OI) and Put-Call Ratio (PCR) analytics charts, and a client-tailored trading SDK.',
+        challenge: 'Handling high-frequency market tick feeds and real-time options payoff diagram recalculations without dropping UI frames.',
+        architecture: 'Implemented Clean Architecture with BLoC state orchestration across React web & Flutter mobile. Engineered resilient WebSocket streaming pipelines with deterministic reconnection lifecycles.',
+        techStack: [
+          'Flutter',
+          'ReactJS',
+          'Trading SDK',
+          'WebSockets',
+          'BLoC',
+          'Redux',
+        ],
+      ),
+      PlatformProject(
+        title: 'NxTrad — Equity Trading Client & Admin',
+        tag: 'Clean Architecture & Offline First',
+        description: 'A full-suite equity trading application developed at IOURING supporting IPO workflows, automated deep-link URL navigation on screenshot detection, and payment gateway integration, alongside an admin console built with Flutter Web.',
+        challenge: 'Ensuring zero-latency portfolio lookups and instant view resumption under unstable mobile network conditions.',
+        architecture: 'Designed SQLite / Drift offline caching pipeline delivering instantaneous load times. Built automated screenshot detection routing and white-labeling capability from a single shared codebase.',
+        techStack: [
+          'Flutter',
+          'Flutter Web',
+          'Clean Architecture',
+          'BLoC',
+          'SQLite / Drift',
+          'Deep Linking',
+        ],
+      ),
+    ],
   ),
 ];
 
 const email = 'prnvmrli@gmail.com';
 const githubUrl = 'https://github.com/prnvmrli';
-const linkedinUrl = 'https://linkedin.com/in/pranavmurali';
-
+const linkedinUrl = 'https://linkedin.com/in/prnvmrli/';

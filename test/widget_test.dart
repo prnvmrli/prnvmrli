@@ -7,4 +7,13 @@ void main() {
     await tester.pumpWidget(const PortfolioApp());
     expect(find.textContaining('Pranav Murali'), findsWidgets);
   });
+
+  testWidgets('Portfolio renders IOURING experience and production platforms', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const PortfolioApp());
+    expect(find.textContaining('IOURING Private Limited'), findsWidgets);
+    expect(find.textContaining('NxtOption'), findsWidgets);
+    expect(find.textContaining('NxTrad'), findsWidgets);
+  });
 }

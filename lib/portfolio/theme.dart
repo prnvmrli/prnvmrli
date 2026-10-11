@@ -7,6 +7,7 @@ class Palette {
   static const canvasBase = Color(0xFFF9F9FF);
   static const surface = Color(0xFFF9F9FF);
   static const surfaceDim = Color(0xFFD7DAE3);
+  static const surfaceContainerLow = Color(0xFFF1F3FC);
   static const surfaceContainer = Color(0xFFEBEDF7);
   static const surfaceContainerHigh = Color(0xFFE6E8F1);
   static const surfaceVariant = Color(0xFFE0E2EB);
@@ -89,11 +90,7 @@ class SectionHeader extends StatelessWidget {
   final String title;
   final String indexTag;
 
-  const SectionHeader({
-    super.key,
-    required this.title,
-    required this.indexTag,
-  });
+  const SectionHeader({super.key, required this.title, required this.indexTag});
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +226,9 @@ class _StatusPulseDotState extends State<StatusPulseDot>
           width: widget.size,
           height: widget.size,
           decoration: BoxDecoration(
-            color: widget.color.withValues(alpha: 0.7 + 0.3 * _controller.value),
+            color: widget.color.withValues(
+              alpha: 0.7 + 0.3 * _controller.value,
+            ),
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
