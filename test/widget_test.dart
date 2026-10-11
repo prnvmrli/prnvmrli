@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:portfolio/main.dart';
@@ -8,10 +9,11 @@ void main() {
     await tester.pumpWidget(const PortfolioApp());
     expect(find.textContaining('Pranav Murali'), findsWidgets);
     expect(find.textContaining('MOBILE SYSTEMS ENGINEER — FLUTTER'), findsWidgets);
-    expect(
-        find.textContaining(
-            'Flutter · Architecture · SDK Engineering · Real-time Systems · Performance'),
-        findsWidgets);
+    expect(find.textContaining('Flutter'), findsWidgets);
+    expect(find.textContaining('Architecture'), findsWidgets);
+    expect(find.textContaining('SDK Engineering'), findsWidgets);
+    expect(find.textContaining('Real-time Systems'), findsWidgets);
+    expect(find.textContaining('Performance'), findsWidgets);
   });
 
   testWidgets('Portfolio renders major content sections and authentic items',
@@ -80,5 +82,25 @@ void main() {
     await tester.tap(find.text('Capabilities').first);
     await tester.pumpAndSettle();
     expect(find.text('Engineering Capabilities'), findsWidgets);
+  });
+
+  testWidgets('Header only displays name when hero name is scrolled out of view',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const PortfolioApp());
+    await tester.pumpAndSettle();
+
+    // Find AnimatedAlign in header controlling name visibility
+    final animatedAligns = tester.widgetList<AnimatedAlign>(find.byType(AnimatedAlign));
+    expect(animatedAligns.isNotEmpty, isTrue);
+    // At top of page, widthFactor is 0.0 (name hidden in header)
+    expect(animatedAligns.first.widthFactor, equals(0.0));
+
+    // Scroll down past the hero name (~200px)
+    await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -250));
+    await tester.pumpAndSettle();
+
+    // After scrolling past hero name, widthFactor becomes 1.0 (name visible in header)
+    final updatedAligns = tester.widgetList<AnimatedAlign>(find.byType(AnimatedAlign));
+    expect(updatedAligns.first.widthFactor, equals(1.0));
   });
 }

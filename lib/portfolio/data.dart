@@ -5,6 +5,14 @@ const role = 'Mobile Systems Engineer — Flutter';
 const location = 'Kerala, India';
 const yearsExperience = '5 Years Production Experience';
 
+const specializationPillars = [
+  'Flutter',
+  'Architecture',
+  'SDK Engineering',
+  'Real-time Systems',
+  'Performance',
+];
+
 const specialization =
     'Flutter · Architecture · SDK Engineering · Real-time Systems · Performance';
 

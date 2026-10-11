@@ -25,8 +25,10 @@ class _PortfolioPageState extends State<PortfolioPage> {
   double? _cachedCapabilitiesY;
   double? _cachedEducationY;
   double? _cachedContactY;
+  double? _cachedHeroNameBottomY;
 
   final GlobalKey _heroKey = GlobalKey();
+  final GlobalKey _heroNameKey = GlobalKey();
   final GlobalKey _projectsKey = GlobalKey();
   final GlobalKey _experienceKey = GlobalKey();
   final GlobalKey _capabilitiesKey = GlobalKey();
@@ -47,7 +49,22 @@ class _PortfolioPageState extends State<PortfolioPage> {
 
   void _onScroll() {
     if (!_scrollController.hasClients) return;
-    final show = _scrollController.offset > 120;
+
+    final nameBox =
+        _heroNameKey.currentContext?.findRenderObject() as RenderBox?;
+    final bool show;
+    if (nameBox != null && nameBox.hasSize) {
+      // Screen Y coordinate of the bottom of the name text in the hero.
+      // Sticky header has height 60.
+      final nameBottomScreenY =
+          nameBox.localToGlobal(Offset.zero).dy + nameBox.size.height;
+      show = nameBottomScreenY <= 60;
+    } else if (_cachedHeroNameBottomY != null) {
+      show = _scrollController.offset >= (_cachedHeroNameBottomY! - 60);
+    } else {
+      show = _scrollController.offset > 110;
+    }
+
     if (show != _showStickyIdentity) {
       setState(() {
         _showStickyIdentity = show;
@@ -68,6 +85,16 @@ class _PortfolioPageState extends State<PortfolioPage> {
   }
 
   void _updateSectionPositions() {
+    final nameCtx = _heroNameKey.currentContext;
+    if (nameCtx != null) {
+      final box = nameCtx.findRenderObject() as RenderBox?;
+      if (box != null && box.hasSize) {
+        _cachedHeroNameBottomY = box.localToGlobal(Offset.zero).dy +
+            _scrollController.offset +
+            box.size.height;
+      }
+    }
+
     final pY = _getSectionAbsoluteY(_projectsKey);
     if (pY != null) _cachedProjectsY = pY;
 
@@ -257,6 +284,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                             delayMs: 0,
                             child: _HeroSection(
                               key: _heroKey,
+                              heroNameKey: _heroNameKey,
                               isMobile: isMobile,
                               onScrollToProjects: () =>
                                   _scrollTo(_projectsKey, section: 'projects'),
@@ -457,18 +485,32 @@ class _StickyHeader extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 10),
-                            AnimatedOpacity(
-                              opacity: showIdentity || !isMobile ? 1.0 : 0.0,
-                              duration: const Duration(milliseconds: 250),
-                              child: const Text(
-                                name,
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: -0.2,
-                                  color: Palette.textPrimary,
+                            ClipRect(
+                              child: AnimatedAlign(
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeInOut,
+                                alignment: Alignment.centerLeft,
+                                widthFactor: showIdentity ? 1.0 : 0.0,
+                                child: AnimatedOpacity(
+                                  duration: const Duration(milliseconds: 200),
+                                  opacity: showIdentity ? 1.0 : 0.0,
+                                  curve: Curves.easeInOut,
+                                  child: const Padding(
+                                    padding: EdgeInsets.only(left: 10),
+                                    child: Text(
+                                      name,
+                                      maxLines: 1,
+                                      softWrap: false,
+                                      overflow: TextOverflow.clip,
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: -0.2,
+                                        color: Palette.textPrimary,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -965,37 +1007,80 @@ class _InteractiveAvatarState extends State<_InteractiveAvatar> {
         scale: _isHovered ? 1.05 : 1.0,
         duration: const Duration(milliseconds: 220),
         curve: Curves.easeOutCubic,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
+        child: SizedBox(
           width: 68,
           height: 68,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Palette.surfaceSecondary,
-            border: Border.all(
-              color: _isHovered ? Palette.accent : Palette.border,
-              width: _isHovered ? 1.5 : 1.0,
-            ),
-            boxShadow: _isHovered
-                ? [
-                    BoxShadow(
-                      color: Palette.accent.withValues(alpha: 0.18),
-                      blurRadius: 14,
-                      offset: const Offset(0, 4),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                width: 68,
+                height: 68,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Palette.surfaceSecondary,
+                  border: Border.all(
+                    color: _isHovered ? Palette.accent : Palette.border,
+                    width: _isHovered ? 1.5 : 1.0,
+                  ),
+                  boxShadow: _isHovered
+                      ? [
+                          BoxShadow(
+                            color: Palette.accent.withValues(alpha: 0.18),
+                            blurRadius: 14,
+                            offset: const Offset(0, 4),
+                          ),
+                        ]
+                      : [],
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Image.asset(
+                  'assets/avatar.png',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.person,
+                    size: 32,
+                    color: Palette.textMuted,
+                  ),
+                ),
+              ),
+
+              // Live Green Status Badge
+              Positioned(
+                bottom: 1,
+                right: 1,
+                child: Tooltip(
+                  message: 'Available for Opportunities',
+                  child: Container(
+                    width: 16,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Palette.surface,
+                      border: Border.all(
+                        color: Palette.canvasBase,
+                        width: 2.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.08),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
                     ),
-                  ]
-                : [],
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Image.asset(
-            'assets/avatar.png',
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => const Icon(
-              Icons.person,
-              size: 32,
-              color: Palette.textMuted,
-            ),
+                    child: const Center(
+                      child: StatusPulseDot(
+                        size: 9,
+                        color: Color(0xFF28CD41),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -1066,6 +1151,7 @@ class _ProjectSourceLinkState extends State<_ProjectSourceLink> {
 // ---------------------------------------------------------------------------
 class _HeroSection extends StatelessWidget {
   final bool isMobile;
+  final GlobalKey? heroNameKey;
   final VoidCallback onScrollToProjects;
   final VoidCallback onScrollToContact;
   final VoidCallback onDownloadResume;
@@ -1075,6 +1161,7 @@ class _HeroSection extends StatelessWidget {
   const _HeroSection({
     super.key,
     required this.isMobile,
+    this.heroNameKey,
     required this.onScrollToProjects,
     required this.onScrollToContact,
     required this.onDownloadResume,
@@ -1110,6 +1197,7 @@ class _HeroSection extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     name,
+                    key: heroNameKey,
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: isMobile ? 28 : 34,
@@ -1127,15 +1215,36 @@ class _HeroSection extends StatelessWidget {
         const SizedBox(height: 24),
 
         // Specialization line
-        Text(
-          specialization,
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: isMobile ? 14 : 15,
-            fontWeight: FontWeight.w500,
-            letterSpacing: -0.2,
-            color: Palette.textPrimary,
-            height: 1.45,
+        Text.rich(
+          TextSpan(
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontSize: isMobile ? 14 : 15,
+              fontWeight: FontWeight.w500,
+              letterSpacing: -0.2,
+              color: Palette.textPrimary,
+              height: 1.5,
+            ),
+            children: [
+              for (int i = 0; i < specializationPillars.length; i++) ...[
+                if (i > 0)
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: Container(
+                      width: 6,
+                      height: 6,
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Palette.accent,
+                      ),
+                    ),
+                  ),
+                TextSpan(
+                  text: specializationPillars[i],
+                ),
+              ],
+            ],
           ),
         ),
 
