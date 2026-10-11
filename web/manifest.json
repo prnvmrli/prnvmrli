@@ -1,11 +1,11 @@
 {
-    "name": "portfolio",
-    "short_name": "portfolio",
+    "name": "Pranav Murali — Mobile Systems Engineer",
+    "short_name": "Pranav Murali",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F9F9FF",
+    "theme_color": "#005CB8",
+    "description": "Portfolio of Pranav Murali — Flutter & Mobile Systems Engineer.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

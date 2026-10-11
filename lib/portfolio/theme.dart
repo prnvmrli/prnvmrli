@@ -1,68 +1,147 @@
 import 'package:flutter/material.dart';
 
+/// Design tokens matching the Light Modern Tech Blue theme from Stitch screen
+/// `16cdd95310ac44b7b421c716cb32c927` in project 6482246001992465397.
 class Palette {
-  static const bg = Color(0xFF09090B);
-  static const surface = Color(0xFF111115);
-  static const surfaceHover = Color(0xFF16161D);
-  static const cardBg = Color(0xFF0D0D11);
-  static const border = Color(0x1AFFFFFF);
-  static const borderHover = Color(0x3D54C5F8);
-  static const textPrimary = Color(0xFFEDEDEF);
-  static const textSecondary = Color(0xFF9CA3AF);
-  static const textMuted = Color(0xFF6B7280);
-  static const accent = Color(0xFF54C5F8);
-  static const accentDim = Color(0x1F54C5F8);
-  static const success = Color(0xFF22C55E);
-  static const successDim = Color(0x1F22C55E);
+  // Light Canvas & Surface Hierarchy
+  static const canvasBase = Color(0xFFF9F9FF);
+  static const surface = Color(0xFFF9F9FF);
+  static const surfaceDim = Color(0xFFD7DAE3);
+  static const surfaceContainer = Color(0xFFEBEDF7);
+  static const surfaceContainerHigh = Color(0xFFE6E8F1);
+  static const surfaceVariant = Color(0xFFE0E2EB);
+
+  // Modern Tech Blue Accent
+  static const primary = Color(0xFF005CB8);
+  static const accent = Color(0xFF005CB8); // #005cb8 Signature Tech Blue
+  static const accentInteractive = Color(0xFF1275E2);
+  static const accentDim = Color(0x14005CB8);
+
+  // Typography Neutrals
+  static const textPrimary = Color(0xFF181C22); // Deep dark crisp text
+  static const textSecondary = Color(0xFF414753); // Neutral readable slate
+  static const textMuted = Color(0xFF717785); // Secondary metadata
+  static const outline = Color(0xFF717785); // Hairline tags & structural specs
+
+  // Structural Borders
+  static const border = Color(0xFFE0E2EB);
+  static const borderLight = Color(0xFFECEEF5);
+  static const borderFocus = Color(0xFF005CB8);
+
+  // Semantic Status (Apple-style available green)
+  static const statusAvailable = Color(0xFF28CD41);
+  static const bg = canvasBase;
 }
 
 ThemeData portfolioTheme() {
   return ThemeData(
-    brightness: Brightness.dark,
-    scaffoldBackgroundColor: Palette.bg,
-    fontFamily: 'Space Grotesk',
-    colorScheme: const ColorScheme.dark(
-      primary: Palette.accent,
-      surface: Palette.surface,
+    brightness: Brightness.light,
+    scaffoldBackgroundColor: Palette.canvasBase,
+    fontFamily: 'Inter',
+    colorScheme: const ColorScheme.light(
+      primary: Palette.primary,
+      surface: Palette.canvasBase,
+      onSurface: Palette.textPrimary,
     ),
     textTheme: const TextTheme(
       displayLarge: TextStyle(
-        fontSize: 54,
-        fontWeight: FontWeight.w700,
-        letterSpacing: -1.5,
-        color: Palette.textPrimary,
-        height: 1.08,
-      ),
-      headlineMedium: TextStyle(
-        fontSize: 32,
-        fontWeight: FontWeight.w600,
+        fontFamily: 'Inter',
+        fontSize: 38,
+        fontWeight: FontWeight.w500,
         letterSpacing: -0.8,
         color: Palette.textPrimary,
+        height: 1.15,
       ),
-      titleLarge: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
+      headlineMedium: TextStyle(
+        fontFamily: 'Inter',
+        fontSize: 22,
+        fontWeight: FontWeight.w500,
+        letterSpacing: -0.3,
         color: Palette.textPrimary,
       ),
       bodyLarge: TextStyle(
-        fontSize: 17,
+        fontFamily: 'Inter',
+        fontSize: 16,
+        fontWeight: FontWeight.w300,
         color: Palette.textSecondary,
         height: 1.65,
       ),
       bodyMedium: TextStyle(
-        fontSize: 15,
+        fontFamily: 'Inter',
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
         color: Palette.textSecondary,
         height: 1.55,
+      ),
+      labelSmall: TextStyle(
+        fontFamily: 'JetBrains Mono',
+        fontSize: 11,
+        letterSpacing: 0.8,
+        color: Palette.outline,
       ),
     ),
   );
 }
 
+/// Minimal Editorial Section Header matching Stitch screen 16cdd95310ac44b7b421c716cb32c927:
+/// Subtle bottom border, uppercase section title on the left, index tag on the right.
+class SectionHeader extends StatelessWidget {
+  final String title;
+  final String indexTag;
+
+  const SectionHeader({
+    super.key,
+    required this.title,
+    required this.indexTag,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.only(bottom: 14),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Palette.border)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          Expanded(
+            child: Text(
+              title.toUpperCase(),
+              style: const TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.2,
+                color: Palette.textPrimary,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            indexTag,
+            style: const TextStyle(
+              fontFamily: 'JetBrains Mono',
+              fontSize: 11,
+              letterSpacing: 0.8,
+              color: Palette.outline,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Monospace badge or tag matching Stitch light design
 class MonoChip extends StatelessWidget {
   final String label;
   final Color? color;
   final Color? background;
   final bool isSmall;
+
   const MonoChip(
     this.label, {
     super.key,
@@ -75,21 +154,20 @@ class MonoChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: isSmall ? 8 : 10,
-        vertical: isSmall ? 3 : 5,
+        horizontal: isSmall ? 6 : 8,
+        vertical: isSmall ? 2 : 4,
       ),
       decoration: BoxDecoration(
-        color: background ?? Palette.surface,
-        border: Border.all(color: Palette.border),
-        borderRadius: BorderRadius.circular(999),
+        color: background ?? Palette.surfaceContainer,
+        borderRadius: BorderRadius.circular(3),
+        border: Border.all(color: Palette.borderLight),
       ),
       child: Text(
         label,
         style: TextStyle(
-          fontFamily: 'IBM Plex Mono',
-          fontSize: isSmall ? 11 : 12,
+          fontFamily: 'JetBrains Mono',
+          fontSize: isSmall ? 10 : 11,
           color: color ?? Palette.textSecondary,
-          letterSpacing: 0.2,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -97,57 +175,72 @@ class MonoChip extends StatelessWidget {
   }
 }
 
-class SectionLabel extends StatelessWidget {
-  final String text;
-  const SectionLabel(this.text, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 8,
-          height: 8,
-          decoration: const BoxDecoration(
-            color: Palette.accent,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          text.toUpperCase(),
-          style: const TextStyle(
-            fontFamily: 'IBM Plex Mono',
-            fontSize: 12,
-            letterSpacing: 2.2,
-            fontWeight: FontWeight.w600,
-            color: Palette.accent,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class SectionTitle extends StatelessWidget {
-  final String text;
-  const SectionTitle(this.text, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: Theme.of(context).textTheme.headlineMedium,
-    );
-  }
-}
-
+/// Subtle Hairline Divider
 class Hairline extends StatelessWidget {
-  const Hairline({super.key});
+  final Color color;
+  const Hairline({super.key, this.color = Palette.border});
 
   @override
   Widget build(BuildContext context) {
-    return Container(height: 1, color: Palette.border);
+    return Container(height: 1, color: color);
+  }
+}
+
+/// Animated Pulse Dot indicator
+class StatusPulseDot extends StatefulWidget {
+  final Color color;
+  final double size;
+
+  const StatusPulseDot({
+    super.key,
+    this.color = Palette.statusAvailable,
+    this.size = 6.0,
+  });
+
+  @override
+  State<StatusPulseDot> createState() => _StatusPulseDotState();
+}
+
+class _StatusPulseDotState extends State<StatusPulseDot>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          width: widget.size,
+          height: widget.size,
+          decoration: BoxDecoration(
+            color: widget.color.withValues(alpha: 0.7 + 0.3 * _controller.value),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: widget.color.withValues(alpha: 0.4 * _controller.value),
+                blurRadius: 5,
+                spreadRadius: 1.2 * _controller.value,
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

@@ -1,5 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'data.dart';
 import 'theme.dart';
 
@@ -11,66 +14,175 @@ class PortfolioPage extends StatefulWidget {
 }
 
 class _PortfolioPageState extends State<PortfolioPage> {
-  final _scroll = ScrollController();
-  final _keys = <String, GlobalKey>{
-    'About': GlobalKey(),
-    'Focus': GlobalKey(),
-    'Experience': GlobalKey(),
-    'Projects': GlobalKey(),
-    'Skills': GlobalKey(),
-    'Education': GlobalKey(),
-    'Contact': GlobalKey(),
-  };
+  final ScrollController _scrollController = ScrollController();
+  bool _showStickyIdentity = false;
 
-  void _scrollTo(String section) {
-    final ctx = _keys[section]?.currentContext;
-    if (ctx == null) return;
-    final box = ctx.findRenderObject() as RenderBox?;
-    if (box == null) return;
-    final offset = box.localToGlobal(Offset.zero).dy + _scroll.offset - 76;
-    _scroll.animateTo(
-      offset.clamp(0.0, _scroll.position.maxScrollExtent),
-      duration: const Duration(milliseconds: 650),
-      curve: Curves.easeInOutCubic,
-    );
+  final GlobalKey _heroKey = GlobalKey();
+  final GlobalKey _workKey = GlobalKey();
+  final GlobalKey _experienceKey = GlobalKey();
+  final GlobalKey _contactKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final show = _scrollController.offset > 110;
+    if (show != _showStickyIdentity) {
+      setState(() {
+        _showStickyIdentity = show;
+      });
+    }
   }
 
   @override
   void dispose() {
-    _scroll.dispose();
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _scrollTo(GlobalKey key) {
+    final ctx = key.currentContext;
+    if (ctx != null) {
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOutCubic,
+      );
+    }
+  }
+
+  Future<void> _openUrl(String urlString) async {
+    final uri = Uri.parse(urlString);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  void _copyEmail(BuildContext context) {
+    Clipboard.setData(const ClipboardData(text: email));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(
+          children: [
+            Icon(Icons.check_circle_outline, color: Palette.accent, size: 16),
+            SizedBox(width: 8),
+            Text(
+              'Email copied to clipboard: $email',
+              style: TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 12,
+                color: Palette.textPrimary,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Palette.canvasBase,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+          side: const BorderSide(color: Palette.border),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final isMobile = width < 640;
+
     return Scaffold(
-      backgroundColor: Palette.bg,
+      backgroundColor: Palette.canvasBase,
       body: Stack(
         children: [
-          CustomScrollView(
-            controller: _scroll,
-            slivers: [
-              SliverToBoxAdapter(
-                child: _Hero(
-                  onProjects: () => _scrollTo('Projects'),
-                  onContact: () => _scrollTo('Contact'),
+          // Main Scrollable Page
+          SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              children: [
+                // Spacer for sticky header
+                const SizedBox(height: 72),
+
+                // Editorial Centered Body
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 768),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 20),
+
+                          // Hero Section with Memoji Avatar
+                          _HeroSection(
+                            key: _heroKey,
+                            isMobile: isMobile,
+                            onScrollToWork: () => _scrollTo(_workKey),
+                            onScrollToContact: () => _scrollTo(_contactKey),
+                            onOpenGitHub: () => _openUrl(githubUrl),
+                            onEmail: () => _openUrl('mailto:$email'),
+                          ),
+
+                          const SizedBox(height: 80),
+
+                          // 01: Selected Systems Work
+                          _SelectedWorkSection(
+                            key: _workKey,
+                            isMobile: isMobile,
+                            onOpenUrl: _openUrl,
+                          ),
+
+                          const SizedBox(height: 80),
+
+                          // 02: Experience
+                          _ExperienceSection(
+                            key: _experienceKey,
+                            isMobile: isMobile,
+                          ),
+
+                          const SizedBox(height: 80),
+
+                          // 03: Contact & Closing
+                          _ContactSection(
+                            key: _contactKey,
+                            onCopyEmail: () => _copyEmail(context),
+                            onOpenUrl: _openUrl,
+                          ),
+
+                          const SizedBox(height: 80),
+
+                          // Footer
+                          const _Footer(),
+
+                          const SizedBox(height: 32),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              SliverToBoxAdapter(child: _About(key: _keys['About'])),
-              SliverToBoxAdapter(child: _FocusAreas(key: _keys['Focus'])),
-              SliverToBoxAdapter(child: _Experience(key: _keys['Experience'])),
-              SliverToBoxAdapter(child: _Projects(key: _keys['Projects'])),
-              SliverToBoxAdapter(child: _Skills(key: _keys['Skills'])),
-              SliverToBoxAdapter(child: _Education(key: _keys['Education'])),
-              SliverToBoxAdapter(child: _Contact(key: _keys['Contact'])),
-              const SliverToBoxAdapter(child: _Footer()),
-            ],
+              ],
+            ),
           ),
+
+          // Sticky Top Navigation Header
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            child: _NavBar(onTap: _scrollTo),
+            child: _StickyHeader(
+              showIdentity: _showStickyIdentity,
+              onScrollToTop: () => _scrollTo(_heroKey),
+              onScrollToWork: () => _scrollTo(_workKey),
+              onScrollToExperience: () => _scrollTo(_experienceKey),
+              onScrollToContact: () => _scrollTo(_contactKey),
+            ),
           ),
         ],
       ),
@@ -78,1184 +190,959 @@ class _PortfolioPageState extends State<PortfolioPage> {
   }
 }
 
-class _NavBar extends StatelessWidget {
-  final void Function(String) onTap;
-  const _NavBar({required this.onTap});
+// ---------------------------------------------------------------------------
+// Sticky Header
+// ---------------------------------------------------------------------------
+class _StickyHeader extends StatelessWidget {
+  final bool showIdentity;
+  final VoidCallback onScrollToTop;
+  final VoidCallback onScrollToWork;
+  final VoidCallback onScrollToExperience;
+  final VoidCallback onScrollToContact;
+
+  const _StickyHeader({
+    required this.showIdentity,
+    required this.onScrollToTop,
+    required this.onScrollToWork,
+    required this.onScrollToExperience,
+    required this.onScrollToContact,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isMobile = constraints.maxWidth < 820;
-
-        return Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 18 : 32,
-            vertical: 14,
-          ),
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          height: 64,
           decoration: BoxDecoration(
-            color: Palette.bg.withValues(alpha: 0.9),
-            border: const Border(bottom: BorderSide(color: Palette.border)),
+            color: Palette.canvasBase.withValues(alpha: 0.88),
+            border: const Border(
+              bottom: BorderSide(color: Palette.borderLight),
+            ),
           ),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1040),
-              child: Row(
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Palette.accent, Color(0xFF0288D1)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        alignment: Alignment.center,
-                        child: const Text(
-                          'PM',
-                          style: TextStyle(
-                            fontFamily: 'Space Grotesk',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
-                            color: Palette.bg,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      const Text(
-                        name,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Palette.textPrimary,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  if (!isMobile)
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
+              constraints: const BoxConstraints(maxWidth: 768),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final showSubtitle = constraints.maxWidth >= 760;
+                    final showExperience = constraints.maxWidth >= 480;
+
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        for (final s in [
-                          'About',
-                          'Experience',
-                          'Projects',
-                          'Skills',
-                          'Contact',
-                        ])
-                          Padding(
-                            padding: const EdgeInsets.only(left: 4),
-                            child: TextButton(
-                              onPressed: () => onTap(s),
-                              style: TextButton.styleFrom(
-                                foregroundColor: Palette.textSecondary,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 6,
-                                ),
-                              ),
-                              child: Text(
-                                s,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
+                        // Avatar + Name + Subtitle (Reveals smoothly when scrolled past hero name)
+                        AnimatedOpacity(
+                          opacity: showIdentity ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 260),
+                          curve: Curves.easeOutCubic,
+                          child: AnimatedSlide(
+                            offset: showIdentity
+                                ? Offset.zero
+                                : const Offset(0, -0.2),
+                            duration: const Duration(milliseconds: 260),
+                            curve: Curves.easeOutCubic,
+                            child: IgnorePointer(
+                              ignoring: !showIdentity,
+                              child: InkWell(
+                                onTap: onScrollToTop,
+                                borderRadius: BorderRadius.circular(4),
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 4),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const _AvatarImage(size: 28),
+                                      const SizedBox(width: 10),
+                                      const Text(
+                                        name,
+                                        style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          letterSpacing: -0.2,
+                                          color: Palette.textPrimary,
+                                        ),
+                                      ),
+                                      if (showSubtitle) ...[
+                                        Container(
+                                          height: 12,
+                                          width: 1,
+                                          color: Palette.border,
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                        ),
+                                        const Text(
+                                          'Mobile Systems Engineer',
+                                          style: TextStyle(
+                                            fontFamily: 'JetBrains Mono',
+                                            fontSize: 11,
+                                            color: Palette.outline,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                           ),
+                        ),
+
+                        // Navigation Links
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _NavLink('Work', onTap: onScrollToWork),
+                            const SizedBox(width: 14),
+                            if (showExperience) ...[
+                              _NavLink('Experience',
+                                  onTap: onScrollToExperience),
+                              const SizedBox(width: 14),
+                            ],
+                            _NavLink('Contact →',
+                                onTap: onScrollToContact, isPrimary: true),
+                          ],
+                        ),
                       ],
-                    )
-                  else
-                    IconButton(
-                      icon: const Icon(Icons.menu_rounded, color: Palette.textSecondary, size: 22),
-                      onPressed: () => onTap('Projects'),
-                      tooltip: 'Menu',
-                    ),
-                ],
+                    );
+                  },
+                ),
               ),
             ),
           ),
-        );
-      },
-    );
-  }
-}
-
-class _Shell extends StatelessWidget {
-  final Widget child;
-  final double verticalPadding;
-  const _Shell({required this.child, this.verticalPadding = 64});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1040),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: verticalPadding),
-          child: child,
         ),
       ),
     );
   }
 }
 
-class _Hero extends StatelessWidget {
-  final VoidCallback onProjects;
-  final VoidCallback onContact;
-  const _Hero({required this.onProjects, required this.onContact});
-
-  @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final isMobile = width < 720;
-
-    return _Shell(
-      verticalPadding: 0,
-      child: Padding(
-        padding: EdgeInsets.only(top: isMobile ? 100 : 124, bottom: 48),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Palette.surface,
-                border: Border.all(color: Palette.border),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Palette.success,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    role,
-                    style: TextStyle(
-                      fontFamily: 'IBM Plex Mono',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Palette.textPrimary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 28),
-            Text(
-              'Crafting high-performance\nmobile apps & real-time\ntrading systems.',
-              style: isMobile
-                  ? Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 34)
-                  : Theme.of(context).textTheme.displayLarge,
-            ),
-            const SizedBox(height: 22),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 680),
-              child: Text(
-                'Hi, I\'m $name. Over 3 years of hands-on experience building '
-                'responsive, scalable applications with Flutter & React JS — specializing in trading platforms, '
-                'financial charting, custom SDKs, and low-latency WebSocket streaming.',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 17),
-              ),
-            ),
-            const SizedBox(height: 36),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                FilledButton.icon(
-                  onPressed: onProjects,
-                  icon: const Icon(Icons.arrow_forward_rounded, size: 16),
-                  label: const Text('View Projects', style: TextStyle(fontWeight: FontWeight.w600)),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Palette.accent,
-                    foregroundColor: Palette.bg,
-                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                ),
-                OutlinedButton.icon(
-                  onPressed: onContact,
-                  icon: const Icon(Icons.mail_outline_rounded, size: 16),
-                  label: const Text('Get in Touch', style: TextStyle(fontWeight: FontWeight.w600)),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Palette.textPrimary,
-                    side: const BorderSide(color: Palette.border),
-                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 48),
-            const Hairline(),
-            const SizedBox(height: 32),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isNarrow = constraints.maxWidth < 640;
-                return Wrap(
-                  spacing: isNarrow ? 20 : 36,
-                  runSpacing: 20,
-                  children: const [
-                    _StatCard(value: '3+ Years', label: 'Hands-on Experience'),
-                    _StatCard(value: '5+ Apps', label: 'Production Flutter & React'),
-                    _StatCard(value: 'Trading SDKs', label: 'Tailored Client Modules'),
-                    _StatCard(value: 'Real-Time', label: 'WebSockets & Clean Arch'),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final String value;
+class _NavLink extends StatefulWidget {
   final String label;
-  const _StatCard({required this.value, required this.label});
+  final VoidCallback onTap;
+  final bool isPrimary;
+
+  const _NavLink(this.label, {required this.onTap, this.isPrimary = false});
+
+  @override
+  State<_NavLink> createState() => _NavLinkState();
+}
+
+class _NavLinkState extends State<_NavLink> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final defaultColor =
+        widget.isPrimary ? Palette.accent : Palette.textSecondary;
+    final hoverColor =
+        widget.isPrimary ? Palette.accentInteractive : Palette.textPrimary;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Text(
+          widget.label,
+          style: TextStyle(
+            fontFamily: 'JetBrains Mono',
+            fontSize: 12,
+            fontWeight: widget.isPrimary ? FontWeight.w600 : FontWeight.w500,
+            color: _hovered ? hoverColor : defaultColor,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Hero Section with Memoji Avatar
+// ---------------------------------------------------------------------------
+class _HeroSection extends StatelessWidget {
+  final bool isMobile;
+  final VoidCallback onScrollToWork;
+  final VoidCallback onScrollToContact;
+  final VoidCallback onOpenGitHub;
+  final VoidCallback onEmail;
+
+  const _HeroSection({
+    super.key,
+    required this.isMobile,
+    required this.onScrollToWork,
+    required this.onScrollToContact,
+    required this.onOpenGitHub,
+    required this.onEmail,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-            color: Palette.accent,
-            fontFamily: 'Space Grotesk',
+        // Hero Profile Header with Avatar, Name, Title, and Availability
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Stack(
+              children: [
+                _AvatarImage(size: isMobile ? 74 : 88),
+                Positioned(
+                  bottom: 2,
+                  right: 2,
+                  child: Container(
+                    width: isMobile ? 14 : 16,
+                    height: isMobile ? 14 : 16,
+                    decoration: BoxDecoration(
+                      color: Palette.statusAvailable,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Palette.canvasBase, width: 2.5),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(width: isMobile ? 14 : 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: [
+                      Text(
+                        name,
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: isMobile ? 22 : 28,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.5,
+                          color: Palette.textPrimary,
+                        ),
+                      ),
+                      if (!isMobile) ...[
+                        Container(
+                          height: 14,
+                          width: 1,
+                          color: Palette.border,
+                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                        ),
+                        const Text(
+                          'Mobile Systems Engineer',
+                          style: TextStyle(
+                            fontFamily: 'JetBrains Mono',
+                            fontSize: 12,
+                            color: Palette.outline,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  if (isMobile) ...[
+                    const SizedBox(height: 2),
+                    const Text(
+                      'Mobile Systems Engineer',
+                      style: TextStyle(
+                        fontFamily: 'JetBrains Mono',
+                        fontSize: 11,
+                        color: Palette.outline,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Palette.surfaceContainer,
+                      border: Border.all(color: Palette.border),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        StatusPulseDot(
+                            color: Palette.statusAvailable, size: 6.0),
+                        SizedBox(width: 6),
+                        Text(
+                          'Available for select engineering contracts',
+                          style: TextStyle(
+                            fontFamily: 'JetBrains Mono',
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: Palette.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  const Text(
+                    'Flutter & Mobile Infrastructure',
+                    style: TextStyle(
+                      fontFamily: 'JetBrains Mono',
+                      fontSize: 11,
+                      color: Palette.outline,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 20),
+
+        // Eyebrow
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 6,
+          children: const [
+            Text(
+              location,
+              style: TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 12,
+                color: Palette.textSecondary,
+              ),
+            ),
+            Text(
+              '·',
+              style: TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 12,
+                color: Palette.outline,
+              ),
+            ),
+            Text(
+              yearsExperience,
+              style: TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 12,
+                color: Palette.textSecondary,
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 14),
+
+        // Large Editorial Headline with Tech Blue Accent
+        RichText(
+          text: TextSpan(
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontSize: isMobile ? 30 : 42,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -1.0,
+              height: 1.15,
+              color: Palette.textPrimary,
+            ),
+            children: const [
+              TextSpan(text: 'I build software that goes '),
+              TextSpan(
+                text: 'beyond',
+                style: TextStyle(
+                  color: Palette.accent,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              TextSpan(text: ' the interface.'),
+            ],
           ),
         ),
-        const SizedBox(height: 2),
+
+        const SizedBox(height: 18),
+
+        // Bio paragraph
         Text(
-          label,
-          style: const TextStyle(
-            fontSize: 13,
+          aboutBio,
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: isMobile ? 15 : 17,
+            fontWeight: FontWeight.w300,
             color: Palette.textSecondary,
-            fontFamily: 'IBM Plex Mono',
+            height: 1.65,
           ),
+        ),
+
+        const SizedBox(height: 14),
+
+        // Focus subtitle
+        Text(
+          focusSummary,
+          style: const TextStyle(
+            fontFamily: 'JetBrains Mono',
+            fontSize: 12,
+            color: Palette.outline,
+            height: 1.5,
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Action links
+        Wrap(
+          spacing: 24,
+          runSpacing: 12,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            _TextLink(
+              label: 'View Selected Work ↓',
+              highlight: true,
+              onTap: onScrollToWork,
+            ),
+            _TextLink(
+              label: 'Get in touch →',
+              onTap: onScrollToContact,
+            ),
+            _TextLink(
+              label: 'GitHub ↗',
+              onTap: onOpenGitHub,
+            ),
+            _TextLink(
+              label: 'Email ↗',
+              onTap: onEmail,
+            ),
+          ],
         ),
       ],
     );
   }
 }
 
-class _About extends StatelessWidget {
-  const _About({super.key});
+// ---------------------------------------------------------------------------
+// 01: Selected Systems Work
+// ---------------------------------------------------------------------------
+class _SelectedWorkSection extends StatelessWidget {
+  final bool isMobile;
+  final void Function(String url) onOpenUrl;
+
+  const _SelectedWorkSection({
+    super.key,
+    required this.isMobile,
+    required this.onOpenUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return _Shell(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SectionLabel('About'),
-          const SizedBox(height: 12),
-          const SectionTitle('Engineered for performance & polish'),
-          const SizedBox(height: 20),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
-            child: Text(about, style: Theme.of(context).textTheme.bodyLarge),
-          ),
-          const SizedBox(height: 20),
-          Container(
-            decoration: BoxDecoration(
-              color: Palette.surface,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Palette.border),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: IntrinsicHeight(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 3,
-                    color: Palette.accent,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.bolt_rounded, size: 18, color: Palette.accent),
-                        const SizedBox(width: 10),
-                        Flexible(
-                          child: Text(
-                            motto,
-                            style: const TextStyle(
-                              fontFamily: 'IBM Plex Mono',
-                              fontSize: 13,
-                              color: Palette.textPrimary,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FocusAreas extends StatelessWidget {
-  const _FocusAreas({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return _Shell(
-      verticalPadding: 16,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SectionLabel('Core Capabilities'),
-          const SizedBox(height: 12),
-          const SectionTitle('What I do'),
-          const SizedBox(height: 24),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final crossAxisCount = constraints.maxWidth < 640 ? 1 : 2;
-              return Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                children: [
-                  for (final item in focusAreas)
-                    SizedBox(
-                      width: crossAxisCount == 1
-                          ? constraints.maxWidth
-                          : (constraints.maxWidth - 16) / 2,
-                      child: _FocusCard(item: item),
-                    ),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FocusCard extends StatefulWidget {
-  final FocusArea item;
-  const _FocusCard({required this.item});
-
-  @override
-  State<_FocusCard> createState() => _FocusCardState();
-}
-
-class _FocusCardState extends State<_FocusCard> {
-  bool _hover = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hover = true),
-      onExit: (_) => setState(() => _hover = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(22),
-        decoration: BoxDecoration(
-          color: _hover ? Palette.surfaceHover : Palette.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: _hover ? Palette.borderHover : Palette.border,
-          ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionHeader(
+          title: 'Selected Systems Work',
+          indexTag: '01 / Production',
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        const SizedBox(height: 36),
+        for (int i = 0; i < projects.length; i++) ...[
+          _ProjectArticle(
+            project: projects[i],
+            isMobile: isMobile,
+            onOpenUrl: onOpenUrl,
+          ),
+          if (i < projects.length - 1) const SizedBox(height: 52),
+        ],
+      ],
+    );
+  }
+}
+
+class _ProjectArticle extends StatelessWidget {
+  final Project project;
+  final bool isMobile;
+  final void Function(String url) onOpenUrl;
+
+  const _ProjectArticle({
+    required this.project,
+    required this.isMobile,
+    required this.onOpenUrl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Title & Metric Tag
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
           children: [
-            Text(widget.item.icon, style: const TextStyle(fontSize: 26)),
-            const SizedBox(height: 12),
-            Text(
-              widget.item.title,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: Palette.textPrimary,
+            Expanded(
+              child: Text(
+                project.title,
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 19,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.3,
+                  color: Palette.textPrimary,
+                ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(width: 12),
             Text(
-              widget.item.description,
-              style: Theme.of(context).textTheme.bodyMedium,
+              project.tag,
+              style: const TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 12,
+                color: Palette.accent,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
 
-class _Experience extends StatelessWidget {
-  const _Experience({super.key});
+        const SizedBox(height: 12),
 
-  @override
-  Widget build(BuildContext context) {
-    return _Shell(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SectionLabel('Experience'),
-          const SizedBox(height: 12),
-          const SectionTitle('Where I\'ve worked'),
-          const SizedBox(height: 28),
-          for (final job in jobs) _JobCard(job: job),
-        ],
-      ),
-    );
-  }
-}
+        // Description
+        Text(
+          project.description,
+          style: const TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+            color: Palette.textSecondary,
+            height: 1.6,
+          ),
+        ),
 
-class _JobCard extends StatelessWidget {
-  final Job job;
-  const _JobCard({required this.job});
+        const SizedBox(height: 14),
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: Palette.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Palette.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final isNarrow = constraints.maxWidth < 580;
-              if (isNarrow) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        // Challenge & Architecture side-border block
+        Container(
+          padding: const EdgeInsets.only(left: 14),
+          decoration: const BoxDecoration(
+            border: Border(
+              left: BorderSide(color: Palette.border, width: 2.0),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RichText(
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 12,
+                    color: Palette.outline,
+                    height: 1.55,
+                  ),
                   children: [
-                    Text(
-                      job.title,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Palette.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      job.company,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Palette.accent,
+                    const TextSpan(
+                      text: 'Challenge: ',
+                      style: TextStyle(
+                        color: Palette.textSecondary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${job.location} • ${job.period}',
-                      style: const TextStyle(
-                        fontFamily: 'IBM Plex Mono',
-                        fontSize: 12,
+                    TextSpan(text: project.challenge),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 6),
+              RichText(
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 12,
+                    color: Palette.outline,
+                    height: 1.55,
+                  ),
+                  children: [
+                    const TextSpan(
+                      text: 'Architecture: ',
+                      style: TextStyle(
                         color: Palette.textSecondary,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
+                    TextSpan(text: project.architecture),
                   ],
-                );
-              }
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 14),
+
+        // Stack & Link Footer
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 16,
+          runSpacing: 8,
+          children: [
+            Text(
+              project.techStack.join(' · '),
+              style: const TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 11,
+                color: Palette.outline,
+              ),
+            ),
+            _TextLink(
+              label: 'View on GitHub ↗',
+              onTap: () => onOpenUrl(project.link),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 02: Experience
+// ---------------------------------------------------------------------------
+class _ExperienceSection extends StatelessWidget {
+  final bool isMobile;
+
+  const _ExperienceSection({
+    super.key,
+    required this.isMobile,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionHeader(
+          title: 'Experience',
+          indexTag: '02 / Trajectory',
+        ),
+        const SizedBox(height: 32),
+        for (final job in jobs) ...[
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Role & Period
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          job.title,
+                          job.role,
                           style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: Palette.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          job.company,
-                          style: const TextStyle(
+                            fontFamily: 'Inter',
                             fontSize: 16,
-                            color: Palette.accent,
                             fontWeight: FontWeight.w600,
+                            color: Palette.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          job.location,
+                          job.company,
                           style: const TextStyle(
-                            fontFamily: 'IBM Plex Mono',
+                            fontFamily: 'JetBrains Mono',
                             fontSize: 12,
-                            color: Palette.textSecondary,
+                            color: Palette.outline,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Palette.cardBg,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: Palette.border),
-                    ),
-                    child: Text(
-                      job.period,
-                      style: const TextStyle(
-                        fontFamily: 'IBM Plex Mono',
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Palette.textSecondary,
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 16),
-          Text(job.summary, style: Theme.of(context).textTheme.bodyMedium),
-          const SizedBox(height: 20),
-          const Hairline(),
-          const SizedBox(height: 20),
-          const Text(
-            'KEY RESPONSIBILITIES & CONTRIBUTIONS',
-            style: TextStyle(
-              fontFamily: 'IBM Plex Mono',
-              fontSize: 11,
-              letterSpacing: 1.5,
-              fontWeight: FontWeight.w600,
-              color: Palette.accent,
-            ),
-          ),
-          const SizedBox(height: 14),
-          for (final bullet in job.achievements)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 7, right: 12),
-                    child: Icon(Icons.circle, size: 6, color: Palette.accent),
-                  ),
-                  Expanded(
-                    child: Text(
-                      bullet,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Palette.textPrimary,
-                            height: 1.5,
-                          ),
+                  const SizedBox(width: 12),
+                  Text(
+                    job.period,
+                    style: const TextStyle(
+                      fontFamily: 'JetBrains Mono',
+                      fontSize: 12,
+                      color: Palette.textSecondary,
                     ),
                   ),
                 ],
               ),
-            ),
-        ],
-      ),
-    );
-  }
-}
+              const SizedBox(height: 14),
 
-class _Projects extends StatelessWidget {
-  const _Projects({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return _Shell(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SectionLabel('Selected Work'),
-          const SizedBox(height: 12),
-          const SectionTitle('Featured Projects & Platforms'),
-          const SizedBox(height: 28),
-          for (final p in projects) _ProjectCard(p),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProjectCard extends StatefulWidget {
-  final Project project;
-  const _ProjectCard(this.project);
-
-  @override
-  State<_ProjectCard> createState() => _ProjectCardState();
-}
-
-class _ProjectCardState extends State<_ProjectCard> {
-  bool _hover = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = widget.project;
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hover = true),
-      onExit: (_) => setState(() => _hover = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.only(bottom: 24),
-        padding: const EdgeInsets.all(28),
-        decoration: BoxDecoration(
-          color: _hover ? Palette.surfaceHover : Palette.surface,
-          border: Border.all(color: _hover ? Palette.borderHover : Palette.border),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
+              // Deliverables
+              for (final point in job.bulletPoints) ...[
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        p.name,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: Palette.textPrimary,
+                      const Text(
+                        '• ',
+                        style: TextStyle(
+                          color: Palette.accent,
+                          fontSize: 13,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        p.subtitle,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Palette.accent,
-                          fontWeight: FontWeight.w500,
+                      Expanded(
+                        child: Text(
+                          point,
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w300,
+                            color: Palette.textSecondary,
+                            height: 1.6,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                Text(
-                  p.year,
-                  style: const TextStyle(
-                    fontFamily: 'IBM Plex Mono',
-                    fontSize: 12,
-                    color: Palette.textSecondary,
-                  ),
-                ),
               ],
-            ),
-            const SizedBox(height: 14),
-            Text(p.description, style: Theme.of(context).textTheme.bodyMedium),
-            const SizedBox(height: 18),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Palette.cardBg,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Palette.border),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (final item in p.highlights)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.only(top: 6, right: 10),
-                            child: Icon(Icons.check_circle_outline_rounded,
-                                size: 14, color: Palette.accent),
-                          ),
-                          Expanded(
-                            child: Text(
-                              item,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: Palette.textPrimary,
-                                height: 1.4,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 18),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final t in p.tags)
-                  MonoChip(
-                    t,
-                    isSmall: true,
-                    background: Palette.cardBg,
-                    color: Palette.textPrimary,
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Skills extends StatelessWidget {
-  const _Skills({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return _Shell(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SectionLabel('Skills & Tooling'),
-          const SizedBox(height: 12),
-          const SectionTitle('Technical Stack'),
-          const SizedBox(height: 24),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final isNarrow = constraints.maxWidth < 640;
-              return Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                children: [
-                  for (final cat in skillCategories)
-                    SizedBox(
-                      width: isNarrow
-                          ? constraints.maxWidth
-                          : (constraints.maxWidth - 16) / 2,
-                      child: Container(
-                        padding: const EdgeInsets.all(22),
-                        decoration: BoxDecoration(
-                          color: Palette.surface,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: Palette.border),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              cat.title,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Palette.accent,
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: [
-                                for (final s in cat.skills)
-                                  MonoChip(
-                                    s,
-                                    background: Palette.cardBg,
-                                    color: Palette.textPrimary,
-                                  ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            },
+            ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _Education extends StatelessWidget {
-  const _Education({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return _Shell(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SectionLabel('Background'),
-          const SizedBox(height: 12),
-          const SectionTitle('Education & Extras'),
-          const SizedBox(height: 24),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final isNarrow = constraints.maxWidth < 640;
-              return Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                children: [
-                  SizedBox(
-                    width: isNarrow
-                        ? constraints.maxWidth
-                        : (constraints.maxWidth - 16) / 2,
-                    child: Container(
-                      padding: const EdgeInsets.all(22),
-                      decoration: BoxDecoration(
-                        color: Palette.surface,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: Palette.border),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Row(
-                            children: [
-                              Icon(Icons.school_rounded, color: Palette.accent, size: 20),
-                              SizedBox(width: 8),
-                              Text(
-                                'EDUCATION',
-                                style: TextStyle(
-                                  fontFamily: 'IBM Plex Mono',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Palette.accent,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 14),
-                          Text(
-                            education.degree,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                              color: Palette.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            education.institution,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Palette.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '${education.location} • ${education.period}',
-                            style: const TextStyle(
-                              fontFamily: 'IBM Plex Mono',
-                              fontSize: 12,
-                              color: Palette.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: isNarrow
-                        ? constraints.maxWidth
-                        : (constraints.maxWidth - 16) / 2,
-                    child: Container(
-                      padding: const EdgeInsets.all(22),
-                      decoration: BoxDecoration(
-                        color: Palette.surface,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: Palette.border),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Row(
-                            children: [
-                              Icon(Icons.translate_rounded, color: Palette.accent, size: 20),
-                              SizedBox(width: 8),
-                              Text(
-                                'LANGUAGES & INTERESTS',
-                                style: TextStyle(
-                                  fontFamily: 'IBM Plex Mono',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Palette.accent,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 14),
-                          const Text(
-                            'Spoken Languages',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Palette.textSecondary,
-                              fontFamily: 'IBM Plex Mono',
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 6,
-                            children: [
-                              for (final lang in spokenLanguages)
-                                MonoChip(lang, isSmall: true, background: Palette.cardBg),
-                            ],
-                          ),
-                          const SizedBox(height: 14),
-                          const Text(
-                            'Personal Interests',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Palette.textSecondary,
-                              fontFamily: 'IBM Plex Mono',
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 6,
-                            children: [
-                              for (final intItem in interests)
-                                MonoChip(intItem, isSmall: true, background: Palette.cardBg),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Contact extends StatelessWidget {
-  const _Contact({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return _Shell(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SectionLabel('Contact'),
-          const SizedBox(height: 12),
-          const SectionTitle('Let\'s build something together'),
-          const SizedBox(height: 16),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 620),
-            child: Text(
-              'I\'m open to new full-time opportunities, high-impact projects, '
-              'and collaborations in mobile engineering and developer SDKs.',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ),
-          const SizedBox(height: 28),
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Palette.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Palette.border),
-            ),
-            child: Column(
-              children: [
-                _ContactRow(
-                  icon: Icons.email_outlined,
-                  label: 'Email',
-                  value: email,
-                  onCopy: () {
-                    Clipboard.setData(const ClipboardData(text: email));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Email copied to clipboard!'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 12),
-                const Hairline(),
-                const SizedBox(height: 12),
-                const _ContactRow(
-                  icon: Icons.code_rounded,
-                  label: 'GitHub',
-                  value: github,
-                ),
-                const SizedBox(height: 12),
-                const Hairline(),
-                const SizedBox(height: 12),
-                const _ContactRow(
-                  icon: Icons.link_rounded,
-                  label: 'LinkedIn',
-                  value: linkedin,
-                ),
-                const SizedBox(height: 12),
-                const Hairline(),
-                const SizedBox(height: 12),
-                const _ContactRow(
-                  icon: Icons.location_on_outlined,
-                  label: 'Location',
-                  value: location,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ContactRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final VoidCallback? onCopy;
-  const _ContactRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-    this.onCopy,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: Palette.accent),
-        const SizedBox(width: 14),
-        SizedBox(
-          width: 90,
-          child: Text(
-            label.toUpperCase(),
-            style: const TextStyle(
-              fontFamily: 'IBM Plex Mono',
-              fontSize: 12,
-              letterSpacing: 1.5,
-              color: Palette.textSecondary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        Expanded(
-          child: SelectableText(
-            value,
-            style: const TextStyle(
-              color: Palette.textPrimary,
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        if (onCopy != null)
-          IconButton(
-            icon: const Icon(Icons.copy_rounded, size: 16, color: Palette.textSecondary),
-            onPressed: onCopy,
-            tooltip: 'Copy',
-          ),
       ],
     );
   }
 }
 
+// ---------------------------------------------------------------------------
+// 03: Contact & Closing
+// ---------------------------------------------------------------------------
+class _ContactSection extends StatelessWidget {
+  final VoidCallback onCopyEmail;
+  final void Function(String url) onOpenUrl;
+
+  const _ContactSection({
+    super.key,
+    required this.onCopyEmail,
+    required this.onOpenUrl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Have an interesting engineering problem?',
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.4,
+            color: Palette.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Looking for a mobile systems engineer who cares deeply about performance, clean architecture, and real-time streaming? Let\'s connect.',
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+            color: Palette.textSecondary,
+            height: 1.5,
+          ),
+        ),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Direct: ',
+              style: TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 12,
+                color: Palette.outline,
+              ),
+            ),
+            _TextLink(
+              label: email,
+              underline: true,
+              highlight: true,
+              onTap: onCopyEmail,
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 16,
+          runSpacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            _TextLink(
+              label: 'GitHub ↗',
+              onTap: () => onOpenUrl(githubUrl),
+            ),
+            _TextLink(
+              label: 'LinkedIn ↗',
+              onTap: () => onOpenUrl(linkedinUrl),
+            ),
+            const Text(
+              '·',
+              style: TextStyle(color: Palette.outline),
+            ),
+            const Text(
+              'Kerala, India (UTC +05:30)',
+              style: TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 12,
+                color: Palette.outline,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Minimal Footer
+// ---------------------------------------------------------------------------
 class _Footer extends StatelessWidget {
   const _Footer();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
+      padding: const EdgeInsets.only(top: 28),
       decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Palette.border)),
+        border: Border(
+          top: BorderSide(color: Palette.borderLight),
+        ),
       ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1040),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final isNarrow = constraints.maxWidth < 600;
-              if (isNarrow) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '© ${DateTime.now().year} $name. Built with Flutter Web.',
-                      style: const TextStyle(
-                        fontFamily: 'IBM Plex Mono',
-                        fontSize: 12,
-                        color: Palette.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Build • Learn • Iterate',
-                      style: TextStyle(
-                        fontFamily: 'IBM Plex Mono',
-                        fontSize: 12,
-                        color: Palette.accent,
-                      ),
-                    ),
-                  ],
-                );
-              }
-              return Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      '© ${DateTime.now().year} $name. Built with Flutter Web.',
-                      style: const TextStyle(
-                        fontFamily: 'IBM Plex Mono',
-                        fontSize: 12,
-                        color: Palette.textSecondary,
-                      ),
-                    ),
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 16,
+        runSpacing: 8,
+        children: const [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              StatusPulseDot(color: Palette.accent, size: 6.0),
+              SizedBox(width: 8),
+              Text(
+                '$name · Systems & Mobile',
+                style: TextStyle(
+                  fontFamily: 'JetBrains Mono',
+                  fontSize: 12,
+                  color: Palette.outline,
+                ),
+              ),
+            ],
+          ),
+          Text(
+            '© 2026 · Built with Flutter Web',
+            style: TextStyle(
+              fontFamily: 'JetBrains Mono',
+              fontSize: 12,
+              color: Palette.outline,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Avatar Image Widget
+// ---------------------------------------------------------------------------
+class _AvatarImage extends StatelessWidget {
+  final double size;
+
+  const _AvatarImage({required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Palette.border, width: 1.5),
+        color: Palette.surfaceContainer,
+      ),
+      child: ClipOval(
+        child: Image.asset(
+          'assets/avatar.png',
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              color: Palette.surfaceContainerHigh,
+              child: Center(
+                child: Text(
+                  'PM',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: size * 0.38,
+                    fontWeight: FontWeight.w600,
+                    color: Palette.accent,
                   ),
-                  const Text(
-                    'Build • Learn • Iterate',
-                    style: TextStyle(
-                      fontFamily: 'IBM Plex Mono',
-                      fontSize: 12,
-                      color: Palette.accent,
-                    ),
-                  ),
-                ],
-              );
-            },
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Hoverable Interactive Link
+// ---------------------------------------------------------------------------
+class _TextLink extends StatefulWidget {
+  final String label;
+  final VoidCallback onTap;
+  final bool underline;
+  final bool highlight;
+
+  const _TextLink({
+    required this.label,
+    required this.onTap,
+    this.underline = false,
+    this.highlight = false,
+  });
+
+  @override
+  State<_TextLink> createState() => _TextLinkState();
+}
+
+class _TextLinkState extends State<_TextLink> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _hovered
+        ? Palette.accentInteractive
+        : (widget.highlight ? Palette.textPrimary : Palette.textSecondary);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Text(
+          widget.label,
+          style: TextStyle(
+            fontFamily: 'JetBrains Mono',
+            fontSize: 12,
+            fontWeight: widget.highlight ? FontWeight.w600 : FontWeight.w500,
+            color: color,
+            decoration: widget.underline
+                ? TextDecoration.underline
+                : TextDecoration.none,
+            decorationColor: Palette.border,
           ),
         ),
       ),
