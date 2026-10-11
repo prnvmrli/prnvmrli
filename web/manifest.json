@@ -1,11 +1,11 @@
 {
-    "name": "Pranav Murali — Mobile Systems Engineer",
+    "name": "Pranav Murali — Software Engineer · Flutter",
     "short_name": "Pranav Murali",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#F9F9FF",
-    "theme_color": "#005CB8",
-    "description": "Portfolio of Pranav Murali — Flutter & Mobile Systems Engineer.",
+    "background_color": "#FBFBFD",
+    "theme_color": "#FBFBFD",
+    "description": "Portfolio of Pranav Murali — Software Engineer specializing in Flutter, client architecture, and real-time streaming.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
