@@ -1485,6 +1485,49 @@ class _ProjectsSection extends StatelessWidget {
   }
 }
 
+class _InProgressBadge extends StatelessWidget {
+  final String label;
+
+  const _InProgressBadge({
+    this.label = 'In Progress',
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFF9500).withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(
+          color: const Color(0xFFFF9500).withValues(alpha: 0.45),
+          width: 1.0,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const StatusPulseDot(
+            size: 5.5,
+            color: Color(0xFFFF9500),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: const TextStyle(
+              fontFamily: 'JetBrains Mono',
+              fontSize: 10.5,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.3,
+              color: Color(0xFFB25000),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ProjectCard extends StatelessWidget {
   final ProjectItem item;
   final bool isMobile;
@@ -1508,29 +1551,41 @@ class _ProjectCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-          // Header: Category tag and external link indicator
+          // Header: Category tag, in-progress badge, and external link indicator
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                child: Text(
-                  item.category.toUpperCase(),
-                  style: const TextStyle(
-                    fontFamily: 'JetBrains Mono',
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.8,
-                    color: Palette.accent,
-                  ),
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 10,
+                  runSpacing: 6,
+                  children: [
+                    Text(
+                      item.category.toUpperCase(),
+                      style: const TextStyle(
+                        fontFamily: 'JetBrains Mono',
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.8,
+                        color: Palette.accent,
+                      ),
+                    ),
+                    if (item.isInProgress)
+                      _InProgressBadge(
+                        label: item.statusLabel ?? 'In Progress',
+                      ),
+                  ],
                 ),
               ),
-              if (item.link != null)
+              if (item.link != null) ...[
+                const SizedBox(width: 8),
                 _ProjectSourceLink(
                   url: item.link!,
                   onTap: () => onOpenUrl(item.link!),
                 ),
+              ],
             ],
           ),
 

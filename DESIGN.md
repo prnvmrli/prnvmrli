@@ -96,9 +96,10 @@ Monospace Font Family: **JetBrains Mono** (fallback: Menlo, Monaco, monospace)
 ### 01 / Projects & Systems Work
 - **Categorization**: Direct spotlights on developer tooling, publishable packages, and infrastructure:
   - `f-cleaner`: Native macOS desktop disk cleanup utility and cache visualizer built on top of `fclean` (core Dart CLI cleanup engine), with native Swift/WidgetKit extensions.
-  - `android_system_chrome`: Flutter plugin for managing Android system bar styling, translucent edge-to-edge UI, and dynamic status bar contrast.
-  - `flutter_notification_icons`: Utility package for resolving, customizing, and styling Android notification badge icons in Flutter.
-  - `aviary`: Self-hosted private Dart Pub server for enterprise package distribution and internal dependency hosting.
+  - `android_system_chrome`: Flutter plugin for managing Android system bar styling, translucent edge-to-edge UI, and dynamic status bar contrast. `[In Progress]`
+  - `flutter_notification_icons`: Utility package for resolving, customizing, and styling Android notification badge icons in Flutter. `[In Progress]`
+  - `aviary`: Self-hosted private Dart Pub server for enterprise package distribution and internal dependency hosting. `[In Progress]`
+- **In-Progress Status Badge (`_InProgressBadge`)**: Understated amber pill badge (`#FF9500` at 12% alpha, hairline border at 45% alpha, live pulsing amber dot `StatusPulseDot(size: 5.5)`, and `In Progress` monospace text `#B25000`) highlighting active in-development packages and tools.
 - **Direct Repositories**: Source links pointing directly to verified GitHub repositories.
 - **Tech Stack Badges**: Monospace badges indicating technologies used.
 

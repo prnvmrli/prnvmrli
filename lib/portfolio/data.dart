@@ -26,6 +26,8 @@ class ProjectItem {
   final String technicalDetails;
   final List<String> techStack;
   final String? link;
+  final bool isInProgress;
+  final String? statusLabel;
 
   const ProjectItem({
     required this.title,
@@ -34,6 +36,8 @@ class ProjectItem {
     required this.technicalDetails,
     required this.techStack,
     this.link,
+    this.isInProgress = false,
+    this.statusLabel,
   });
 }
 
@@ -67,6 +71,7 @@ const projects = [
       'WindowInsets',
     ],
     link: 'https://github.com/prnvmrli/fl-studio',
+    isInProgress: true,
   ),
   ProjectItem(
     title: 'flutter_notification_icons — Dynamic Notification Icon Utility',
@@ -81,6 +86,7 @@ const projects = [
       'Asset Pipeline',
     ],
     link: 'https://github.com/prnvmrli/fl-studio',
+    isInProgress: true,
   ),
   ProjectItem(
     title: 'aviary — Private Dart Pub Server',
@@ -95,6 +101,7 @@ const projects = [
       'CLI Tooling',
     ],
     link: 'https://github.com/prnvmrli/aviary',
+    isInProgress: true,
   ),
 ];
 

@@ -27,6 +27,7 @@ void main() {
     expect(find.textContaining('android_system_chrome'), findsWidgets);
     expect(find.textContaining('flutter_notification_icons'), findsWidgets);
     expect(find.textContaining('aviary'), findsWidgets);
+    expect(find.text('In Progress'), findsNWidgets(3));
 
     // 02: Experience (IOURING & Minimal Timeline with Green Highlight)
     expect(find.textContaining('Professional Experience'), findsWidgets);
