@@ -12,11 +12,11 @@ class Palette {
   static const surfaceContainer = Color(0xFFF5F5F7);
   static const surfaceContainerLow = Color(0xFFFAFAFC);
 
-  // Typography Neutrals
-  static const textPrimary = Color(0xFF1D1D1F); // Near-black primary text
-  static const textSecondary = Color(0xFF515154); // Neutral dark grey
-  static const textMuted = Color(0xFF86868B); // Neutral secondary grey metadata
-  static const outline = Color(0xFF86868B); // Technical tags & labels
+  // Typography Neutrals (WCAG AA compliant against #FBFBFD canvas & #FFFFFF surface)
+  static const textPrimary = Color(0xFF1D1D1F); // Near-black primary text (>15:1 contrast)
+  static const textSecondary = Color(0xFF515154); // Neutral dark grey (~7.5:1 contrast)
+  static const textMuted = Color(0xFF636366); // Darker neutral grey for accessible metadata & labels (~5.85:1 contrast)
+  static const outline = Color(0xFF636366); // Technical tags & labels (~5.85:1 contrast)
 
   // Restrained Hairline Borders & Dividers
   static const border = Color(0xFFE5E5EA); // Hairline border
@@ -38,6 +38,14 @@ ThemeData portfolioTheme() {
     brightness: Brightness.light,
     scaffoldBackgroundColor: Palette.canvasBase,
     fontFamily: 'Inter',
+    fontFamilyFallback: const [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      'Segoe UI',
+      'Roboto',
+      'Helvetica Neue',
+      'sans-serif',
+    ],
     colorScheme: const ColorScheme.light(
       primary: Palette.accent,
       surface: Palette.canvasBase,
@@ -155,44 +163,55 @@ class MonoChip extends StatefulWidget {
 }
 
 class _MonoChipState extends State<MonoChip> {
-  bool _isHovered = false;
+  final ValueNotifier<bool> _isHovered = ValueNotifier<bool>(false);
+
+  @override
+  void dispose() {
+    _isHovered.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = _isHovered
-        ? Palette.accentDim
-        : (widget.background ?? Palette.surfaceSecondary);
-    final borderColor = _isHovered
-        ? Palette.accent.withValues(alpha: 0.35)
-        : Palette.border;
-    final textColor = _isHovered
-        ? Palette.accent
-        : (widget.color ?? Palette.textSecondary);
-
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
-        curve: Curves.easeOutCubic,
-        padding: EdgeInsets.symmetric(
-          horizontal: widget.isSmall ? 7 : 9,
-          vertical: widget.isSmall ? 3 : 4,
-        ),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: borderColor, width: 0.8),
-        ),
-        child: Text(
-          widget.label,
-          style: TextStyle(
-            fontFamily: 'JetBrains Mono',
-            fontSize: widget.isSmall ? 10 : 11,
-            color: textColor,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+      onEnter: (_) => _isHovered.value = true,
+      onExit: (_) => _isHovered.value = false,
+      child: ValueListenableBuilder<bool>(
+        valueListenable: _isHovered,
+        builder: (context, isHovered, _) {
+          final bgColor = isHovered
+              ? Palette.accentDim
+              : (widget.background ?? Palette.surfaceSecondary);
+          final borderColor = isHovered
+              ? Palette.accent.withValues(alpha: 0.35)
+              : Palette.border;
+          final textColor = isHovered
+              ? Palette.accent
+              : (widget.color ?? Palette.textSecondary);
+
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            curve: Curves.easeOutCubic,
+            padding: EdgeInsets.symmetric(
+              horizontal: widget.isSmall ? 7 : 9,
+              vertical: widget.isSmall ? 3 : 4,
+            ),
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(color: borderColor, width: 0.8),
+            ),
+            child: Text(
+              widget.label,
+              style: TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: widget.isSmall ? 10 : 11,
+                color: textColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
