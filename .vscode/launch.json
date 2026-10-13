@@ -2,31 +2,50 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "portfolio (Chrome)",
+      "name": "portfolio (Chrome - Debug)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
       "deviceId": "chrome"
     },
     {
-      "name": "portfolio",
-      "request": "launch",
-      "type": "dart",
-      "program": "lib/main.dart"
-    },
-    {
-      "name": "portfolio (profile mode)",
+      "name": "portfolio (Chrome - WASM Debug)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
-      "flutterMode": "profile"
+      "deviceId": "chrome",
+      "args": [
+        "--wasm"
+      ]
     },
     {
-      "name": "portfolio (release mode)",
+      "name": "portfolio (Chrome - Release WASM)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
+      "deviceId": "chrome",
+      "flutterMode": "release",
+      "args": [
+        "--wasm"
+      ]
+    },
+    {
+      "name": "portfolio (Chrome - Release JS)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "chrome",
       "flutterMode": "release"
+    },
+    {
+      "name": "portfolio (Web Server)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "web-server",
+      "args": [
+        "--web-port=8080"
+      ]
     }
   ]
 }
