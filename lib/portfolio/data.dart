@@ -44,7 +44,7 @@ class ProjectItem {
 const projects = [
   ProjectItem(
     title: 'f-cleaner — Desktop Disk Cleanup App',
-    category: 'Flutter Desktop / macOS · fl-studio',
+    category: 'Flutter Desktop / macOS',
     description: 'An app built on top of fclean (core Dart CLI cleanup engine). A native macOS desktop disk cleanup utility and cache visualizer that reclaims gigabytes of disk space from stale Flutter build artifacts, derived data, and Gradle/Xcode caches.',
     technicalDetails: 'Engineered on top of fclean with stream-based asynchronous file system traversal, reactive disk scan state, and native Swift/WidgetKit desktop extensions for glanceable storage telemetry.',
     techStack: [
@@ -55,11 +55,11 @@ const projects = [
       'Swift',
       'Melos Monorepo',
     ],
-    link: 'https://github.com/prnvmrli/fl-studio',
+    link: 'https://github.com/prnvmrli/fl-studio/tree/main/apps/fcleaner',
   ),
   ProjectItem(
     title: 'android_system_chrome — System Bar Management Plugin',
-    category: 'Flutter Plugin / Android Native · fl-studio',
+    category: 'Flutter Plugin / Android Native',
     description: 'Open-source Flutter plugin providing fine-grained runtime control over Android system UI elements, enabling modern translucent edge-to-edge styling, dynamic status bar tinting, and adaptive navigation bar contrast.',
     technicalDetails: 'Implemented native Android platform channel bindings in Kotlin interfacing with modern WindowInsets and WindowInsetsControllerCompat APIs across Android SDK versions.',
     techStack: [
@@ -70,12 +70,12 @@ const projects = [
       'Platform Channels',
       'WindowInsets',
     ],
-    link: 'https://github.com/prnvmrli/fl-studio',
+    link: 'https://github.com/prnvmrli/fl-studio/tree/main/packages/android_system_chrome',
     isInProgress: true,
   ),
   ProjectItem(
     title: 'flutter_notification_icons — Dynamic Notification Icon Utility',
-    category: 'Flutter Package / Android Native · fl-studio',
+    category: 'Flutter Package / Android Native',
     description: 'Lightweight utility package for resolving, customizing, and styling Android notification icons, small drawables, and badge accents in Flutter applications.',
     technicalDetails: 'Provides clean declarative APIs for dynamic asset resolution, resource tinting, and consistent notification icon presentation across diverse OEM Android distributions.',
     techStack: [
@@ -85,7 +85,7 @@ const projects = [
       'Package Engineering',
       'Asset Pipeline',
     ],
-    link: 'https://github.com/prnvmrli/fl-studio',
+    link: 'https://github.com/prnvmrli/fl-studio/tree/main/packages/flutter_notification_icons',
     isInProgress: true,
   ),
   ProjectItem(
