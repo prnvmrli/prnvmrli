@@ -63,25 +63,38 @@ class StickyHeader extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
+                            SizedBox(
                               width: 28,
                               height: 28,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Palette.surfaceSecondary,
-                                border: Border.all(
-                                    color: Palette.border, width: 1.0),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Image.asset(
-                                'assets/avatar.png',
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const Icon(
-                                  Icons.person,
-                                  size: 16,
-                                  color: Palette.textMuted,
-                                ),
+                              child: Stack(
+                                children: [
+                                  Positioned.fill(
+                                    child: ClipOval(
+                                      child: Image.asset(
+                                        'assets/avatar.png',
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                const Icon(
+                                          Icons.person,
+                                          size: 16,
+                                          color: Palette.textMuted,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned.fill(
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: Palette.border,
+                                          width: 1.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             ClipRect(

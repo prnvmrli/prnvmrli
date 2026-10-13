@@ -37,6 +37,7 @@ class _InteractiveAvatarState extends State<InteractiveAvatar> {
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
+                  // Base surface & hover glow halo
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 220),
                     curve: Curves.easeOutCubic,
@@ -45,10 +46,6 @@ class _InteractiveAvatarState extends State<InteractiveAvatar> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Palette.surfaceSecondary,
-                      border: Border.all(
-                        color: isHovered ? Palette.accent : Palette.border,
-                        width: isHovered ? 1.5 : 1.0,
-                      ),
                       boxShadow: isHovered
                           ? [
                               BoxShadow(
@@ -59,14 +56,34 @@ class _InteractiveAvatarState extends State<InteractiveAvatar> {
                             ]
                           : [],
                     ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Image.asset(
-                      'assets/avatar.png',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(
-                        Icons.person,
-                        size: 32,
-                        color: Palette.textMuted,
+                  ),
+
+                  // Edge-to-edge circular avatar image (exact size of the circle)
+                  Positioned.fill(
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/avatar.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => const Icon(
+                          Icons.person,
+                          size: 32,
+                          color: Palette.textMuted,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Overlay border ring (does not inset image)
+                  Positioned.fill(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOutCubic,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isHovered ? Palette.accent : Palette.border,
+                          width: isHovered ? 1.5 : 1.0,
+                        ),
                       ),
                     ),
                   ),
