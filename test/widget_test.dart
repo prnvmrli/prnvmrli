@@ -45,13 +45,17 @@ void main() {
     expect(find.textContaining('Engineering Capabilities'), findsWidgets);
     expect(
         find.textContaining('Architecture & SDK Engineering'), findsWidgets);
-    expect(find.textContaining('Real-time Systems'), findsWidgets);
-    expect(find.textContaining('Security & Reliability'), findsWidgets);
+    expect(find.textContaining('Backend & Integration'), findsWidgets);
+    expect(find.textContaining('AI Tooling & Workflows'), findsWidgets);
     expect(find.textContaining('Testing & Delivery'), findsWidgets);
     expect(find.textContaining('Languages & Frameworks'), findsWidgets);
     expect(find.text('Modularization'), findsWidgets);
     expect(find.text('WebSockets'), findsWidgets);
-    expect(find.text('SSL Pinning'), findsWidgets);
+    expect(find.text('Local LLMs'), findsWidgets);
+    expect(find.text('Ollama'), findsWidgets);
+    expect(find.text('MCP'), findsWidgets);
+    expect(find.text('Coding Agents'), findsWidgets);
+    expect(find.text('Agent Skills'), findsWidgets);
     expect(find.text('Patrol'), findsWidgets);
     expect(find.text('Dart'), findsWidgets);
     expect(find.text('TypeScript'), findsWidgets);

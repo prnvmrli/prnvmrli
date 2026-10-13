@@ -264,20 +264,25 @@ const capabilityGroups = [
   ),
   CapabilityGroup(
     index: '03',
-    title: 'Real-time Systems',
+    title: 'Backend & Integration',
     bullets: ['Firebase', 'WebSockets', 'REST API'],
     accentColor: Color(0xFF28CD41), // Apple Emerald
   ),
   CapabilityGroup(
     index: '04',
-    title: 'Security & Reliability',
-    bullets: ['SSL Pinning', 'Secure Storage'],
+    title: 'AI Tooling & Workflows',
+    bullets: ['Local LLMs', 'Ollama', 'MCP', 'Coding Agents', 'Agent Skills'],
     accentColor: Color(0xFFFF9500), // Apple Amber
   ),
   CapabilityGroup(
     index: '05',
     title: 'Testing & Delivery',
-    bullets: ['Integration Testing', 'Patrol', 'Git', 'Azure DevOps'],
+    bullets: [
+      'Integration Testing',
+      'Patrol',
+      'Azure CI/CD',
+      'App Store Releases',
+    ],
     accentColor: Color(0xFF30B0C7), // Apple Teal
   ),
 ];
