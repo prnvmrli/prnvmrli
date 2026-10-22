@@ -90,7 +90,7 @@ Monospace Font Family: **JetBrains Mono** (fallback: Menlo, Monaco, monospace)
 - **Avatar**: 68px circular portrait (`assets/avatar.png`) with subtle hairline border.
 - **Identity / Title**: Clear systems-focused positioning: `Mobile Systems Engineer — Flutter`.
 - **Specialization Line**: `Flutter · Architecture · SDK Engineering · Real-time Systems · Performance`.
-- **Engineering Summary**: 5 years of production experience focused on application architecture, developer SDKs, reactive state management, real-time streaming, rendering performance, and maintainable APIs at IOURING Private Limited.
+- **Engineering Summary**: Mobile systems engineer with 5 years of experience building production software, specialising in Flutter, application architecture, SDK development, and performance-critical systems. Experienced in designing reusable mobile foundations and real-time systems for financial platforms, with a focus on reliability, maintainability, and engineering quality. Integrates AI-assisted SDLC workflows to improve engineering productivity and accelerate delivery.
 - **Interactive Callouts**: "Get in Touch" primary action, "View Work ↓", and direct links to GitHub and LinkedIn.
 
 ### 01 / Projects & Systems Work
@@ -122,11 +122,11 @@ Monospace Font Family: **JetBrains Mono** (fallback: Menlo, Monaco, monospace)
   - **Right Column (~65%)**: Interactive one-word capability token pills with subtle micro-dots and gentle hover tint.
   - **Hover Micro-Interactions**: The row itself remains transparent and cardless with zero box pop-in. Hovering over any capability pill smoothly illuminates the token with its category accent tint (`12%` alpha), accent border (`#0071E3`, `#5856D6`, etc.), accent text, and a luminous accent dot glow.
   - **Domains & Palette**:
-    - `01 — Languages & Frameworks`: Dart, Flutter, React, TypeScript, Swift, Kotlin (`#0071E3` Tech Blue).
-    - `02 — Architecture & SDK Engineering`: Modularization, Monorepos, SDKs, BLoC (`#5856D6` Indigo).
-    - `03 — Real-time Systems`: WebSockets, Streaming, State, Lifecycle (`#28CD41` Emerald).
-    - `04 — Security & Reliability`: SSL Pinning, Storage, Reliability, Error Handling (`#FF9500` Amber).
-    - `05 — Testing & Delivery`: Integration, Patrol, Releases, CI/CD (`#30B0C7` Teal).
+    - `01 — Languages & Frameworks`: Dart, Flutter, React, JavaScript, TypeScript, Python, HTML & CSS (`#0071E3` Tech Blue).
+    - `02 — Architecture & SDK Engineering`: Clean Architecture, Modularization, Monorepos (Melos), SDKs, BLoC (`#5856D6` Indigo).
+    - `03 — Backend & Integration`: Firebase, WebSockets, REST API (`#28CD41` Emerald).
+    - `04 — AI Tooling & Workflows`: AI SDLC, Local LLMs, Ollama, MCP, Agent Skills (`#FF9500` Amber).
+    - `05 — Testing & Delivery`: Integration Testing, Patrol, Azure CI/CD, App Store Releases (`#30B0C7` Teal).
 
 ### 04 / Education
 - **Formal Education**: B.Tech in Mechanical Engineering, Government Engineering College, Idukki (2016 — 2020), Kerala, India. Understated elevation card presenting degree, institution, timeline, and location.

@@ -51,10 +51,10 @@ void main() {
     expect(find.textContaining('Languages & Frameworks'), findsWidgets);
     expect(find.text('Modularization'), findsWidgets);
     expect(find.text('WebSockets'), findsWidgets);
+    expect(find.text('AI SDLC'), findsWidgets);
     expect(find.text('Local LLMs'), findsWidgets);
     expect(find.text('Ollama'), findsWidgets);
     expect(find.text('MCP'), findsWidgets);
-    expect(find.text('Coding Agents'), findsWidgets);
     expect(find.text('Agent Skills'), findsWidgets);
     expect(find.text('Patrol'), findsWidgets);
     expect(find.text('Dart'), findsWidgets);

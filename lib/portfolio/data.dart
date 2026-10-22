@@ -17,7 +17,7 @@ const specialization =
     'Flutter · Architecture · SDK Engineering · Real-time Systems · Performance';
 
 const aboutBio =
-    'Software engineer with 5 years of experience building production software. Focused on application architecture, developer SDKs, reactive state management, real-time streaming, rendering performance, and maintainable APIs. At IOURING Private Limited, I work on production trading applications, charting SDKs, and modular multi-tenant systems designed for performance, stability, and maintainability.';
+    'Mobile systems engineer with 5 years of experience building production software, specialising in Flutter, application architecture, SDK development, and performance-critical systems. Experienced in designing reusable mobile foundations and real-time systems for financial platforms, with a focus on reliability, maintainability, and engineering quality. Integrates AI-assisted SDLC workflows to improve engineering productivity and accelerate delivery.';
 
 class ProjectItem {
   final String title;
@@ -271,7 +271,7 @@ const capabilityGroups = [
   CapabilityGroup(
     index: '04',
     title: 'AI Tooling & Workflows',
-    bullets: ['Local LLMs', 'Ollama', 'MCP', 'Coding Agents', 'Agent Skills'],
+    bullets: ['AI SDLC', 'Local LLMs', 'Ollama', 'MCP', 'Agent Skills'],
     accentColor: Color(0xFFFF9500), // Apple Amber
   ),
   CapabilityGroup(
