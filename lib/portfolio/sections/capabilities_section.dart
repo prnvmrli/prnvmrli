@@ -28,11 +28,6 @@ class EngineeringCapabilitiesSection extends StatelessWidget {
 
             return Column(
               children: [
-                const Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: Palette.border,
-                ),
                 for (int i = 0; i < capabilityGroups.length; i++) ...[
                   SpecMatrixRow(
                     group: capabilityGroups[i],
