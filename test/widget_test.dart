@@ -32,6 +32,8 @@ void main() {
     // 02: Experience (IOURING & Minimal Timeline with Green Highlight)
     expect(find.textContaining('Professional Experience'), findsWidgets);
     expect(find.textContaining('IOURING Private Limited'), findsWidgets);
+    expect(find.textContaining('Software Engineer'), findsWidgets);
+    expect(find.textContaining('Software Engineering Intern'), findsWidgets);
     expect(find.text('Present'), findsWidgets);
     expect(find.textContaining('PRODUCTION SYSTEMS DELIVERED'), findsWidgets);
     expect(find.textContaining('NeoCharts'), findsWidgets);
@@ -44,14 +46,14 @@ void main() {
     // 03: Engineering Capabilities
     expect(find.textContaining('Engineering Capabilities'), findsWidgets);
     expect(
-        find.textContaining('Architecture & SDK Engineering'), findsWidgets);
-    expect(find.textContaining('Backend & Integration'), findsWidgets);
+        find.textContaining('Architecture & Mobile Systems'), findsWidgets);
+    expect(find.textContaining('Networking & Integration'), findsWidgets);
     expect(find.textContaining('AI Tooling & Workflows'), findsWidgets);
     expect(find.textContaining('Testing & Delivery'), findsWidgets);
     expect(find.textContaining('Languages & Frameworks'), findsWidgets);
     expect(find.text('Modularization'), findsWidgets);
     expect(find.text('WebSockets'), findsWidgets);
-    expect(find.text('AI SDLC'), findsWidgets);
+    expect(find.text('AI-assisted SDLC'), findsWidgets);
     expect(find.text('Local LLMs'), findsWidgets);
     expect(find.text('Ollama'), findsWidgets);
     expect(find.text('MCP'), findsWidgets);

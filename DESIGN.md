@@ -107,9 +107,11 @@ Monospace Font Family: **JetBrains Mono** (fallback: Menlo, Monaco, monospace)
 - **Minimal Timeline Track**: Clean vertical stem line with layout-safe `Stack` positioning and bespoke timeline nodes (`_TimelineNode`).
 - **Active Role Highlight**:
   - **Present Green Badge (`_CurrentBadge`)**: Pill badge with subtle emerald fill (`#28CD41` at 12% alpha), hairline border, pulsing green dot (`StatusPulseDot(size: 5.5)`), and `Present` label in `JetBrains Mono` (`#1E8E3E`).
-  - **Timeline Node (`_TimelineNode`)**: Concentric emerald glowing node with live pulsing status indicator for ongoing roles (`Jan 2022 — Present`), with neutral muted nodes for past milestones.
-- **IOURING Private Limited**: Software Developer (Flutter & React), Jan 2022 — Present.
-- **Production Deliverables**: Technical summary and bullet points detailing production WebSocket architectures, Drift caching, and BLoC implementations.
+  - **Timeline Node (`_TimelineNode`)**: Concentric emerald glowing node with live pulsing status indicator for ongoing roles (`Oct 2022 — Present`), with neutral muted nodes for past milestones (`Jan 2022 — Sep 2022`).
+- **IOURING Private Limited**:
+  - `Software Engineer` (Oct 2022 — Present): Architectural guidance, cross-platform Flutter applications, SDKs, native Android integration, and CI/CD pipelines.
+  - `Software Engineering Intern` (Jan 2022 — Sep 2022): React web apps and Flutter UI components.
+- **Production Deliverables**: Clean bullet points detailing architectural guidance, production SDKs, cross-platform apps, WebSocket architectures, and CI/CD releases.
 - **Key Production Systems (Uniform Architecture Cards)**: Balanced, equal-height card grid on desktop (`IntrinsicHeight` with bottom-pinned tech stacks) highlighting production platforms built for client deployments:
   - `NeoCharts`: Precision Charting Infrastructure & SDK (Flutter, Canvas Rendering, Charting SDK, Real-time Streaming, WebSockets).
   - `NxtOption`: Options Trading Platform & SDK (Flutter, ReactJS, Trading SDK, WebSockets, BLoC, Redux).
@@ -123,10 +125,10 @@ Monospace Font Family: **JetBrains Mono** (fallback: Menlo, Monaco, monospace)
   - **Hover Micro-Interactions**: The row itself remains transparent and cardless with zero box pop-in. Hovering over any capability pill smoothly illuminates the token with its category accent tint (`12%` alpha), accent border (`#0071E3`, `#5856D6`, etc.), accent text, and a luminous accent dot glow.
   - **Domains & Palette**:
     - `01 — Languages & Frameworks`: Dart, Flutter, React, JavaScript, TypeScript, Python, HTML & CSS (`#0071E3` Tech Blue).
-    - `02 — Architecture & SDK Engineering`: Clean Architecture, Modularization, Monorepos (Melos), SDKs, BLoC (`#5856D6` Indigo).
-    - `03 — Backend & Integration`: Firebase, WebSockets, REST API (`#28CD41` Emerald).
-    - `04 — AI Tooling & Workflows`: AI SDLC, Local LLMs, Ollama, MCP, Agent Skills (`#FF9500` Amber).
-    - `05 — Testing & Delivery`: Integration Testing, Patrol, Azure CI/CD, App Store Releases (`#30B0C7` Teal).
+    - `02 — Architecture & Mobile Systems`: Clean Architecture, BLoC, Modularization, Monorepos (Melos), SDK Development (`#5856D6` Indigo).
+    - `03 — Networking & Integration`: REST APIs, WebSockets, Firebase (`#28CD41` Emerald).
+    - `04 — AI Tooling & Workflows`: AI-assisted SDLC, Local LLMs, Ollama, MCP, Agent Skills (`#FF9500` Amber).
+    - `05 — Testing & Delivery`: Git, Integration Testing, Patrol, Azure Pipelines, GitHub Actions, Build Automation, App Store Releases (`#30B0C7` Teal).
 
 ### 04 / Education
 - **Formal Education**: B.Tech in Mechanical Engineering, Government Engineering College, Idukki (2016 — 2020), Kerala, India. Understated elevation card presenting degree, institution, timeline, and location.

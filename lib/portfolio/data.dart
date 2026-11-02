@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 const name = 'Pranav Murali';
 const role = 'Mobile Systems Engineer — Flutter';
 const location = 'Kerala, India';
-const yearsExperience = '5 Years Production Experience';
+const yearsExperience = 'Nearly 5 Years Production Experience';
 
 const specializationPillars = [
   'Flutter',
@@ -17,7 +17,7 @@ const specialization =
     'Flutter · Architecture · SDK Engineering · Real-time Systems · Performance';
 
 const aboutBio =
-    'Mobile systems engineer with 5 years of experience building production software, specialising in Flutter, application architecture, SDK development, and performance-critical systems. Experienced in designing reusable mobile foundations and real-time systems for financial platforms, with a focus on reliability, maintainability, and engineering quality. Integrates AI-assisted SDLC workflows to improve engineering productivity and accelerate delivery.';
+    'Mobile systems engineer with nearly 5 years of experience building production software, specialising in Flutter, mobile architecture, SDK engineering, and performance-critical systems. Experienced in developing reusable mobile foundations and real-time systems for financial platforms, with a focus on reliability, maintainability, and scalability. Integrates AI-assisted SDLC workflows to improve engineering productivity and accelerate delivery.';
 
 class ProjectItem {
   final String title;
@@ -91,7 +91,7 @@ const projects = [
   ProjectItem(
     title: 'aviary — Private Dart Pub Server',
     category: 'Open-Source Infrastructure',
-    description: 'Self-hosted private Dart Pub server designed for enterprise package distribution, internal dependency hosting, and team-wide package governance.',
+    description: 'Self-hosted private Dart package registry with token-based access control and caching for enterprise Flutter and Dart package distribution.',
     technicalDetails: 'Provides a private package registry and local caching layer to support modular Dart and Flutter library distribution across enterprise teams with token-based access control.',
     techStack: [
       'Dart',
@@ -124,7 +124,7 @@ class Job {
   final String company;
   final String period;
   final String location;
-  final String summary;
+  final String? summary;
   final List<String> bulletPoints;
   final List<ProductionPlatform> platforms;
   final bool isCurrent;
@@ -134,7 +134,7 @@ class Job {
     required this.company,
     required this.period,
     required this.location,
-    required this.summary,
+    this.summary,
     required this.bulletPoints,
     this.platforms = const [],
     this.isCurrent = false,
@@ -143,25 +143,26 @@ class Job {
 
 const jobs = [
   Job(
-    role: 'Software Developer (Flutter & React)',
+    role: 'Software Engineer',
     company: 'IOURING Private Limited',
-    period: 'Jan 2022 — Present',
-    location: 'Chennai, TN, India',
-    summary: 'Developing and maintaining production Flutter mobile/web applications and React web apps, focusing on financial trading terminals, charting tools (NeoCharts), and client SDKs.',
+    period: 'Oct 2022 — Present',
+    location: 'Chennai, India',
     isCurrent: true,
     bulletPoints: [
-      'Developed and maintained 3+ production Flutter mobile/web applications and 2+ React web apps, focusing on trading systems and custom SDKs.',
-      'Architected resilient WebSocket streaming pipelines and RESTful integrations for real-time market quotes and live order execution.',
-      'Applied BLoC pattern and Clean Architecture principles to construct scalable, modular, and easily testable Flutter codebases.',
-      'Integrated SQLite with Drift for high-efficiency local data caching, enabling seamless offline resumption and sub-10ms queries.',
-      'Delivered white-label solutions from a unified codebase, supporting distinct branding and multi-client deployments.',
-      'Collaborated closely with product and UI/UX designers to translate Figma designs into pixel-perfect, 60fps Flutter user experiences.',
+      'Guided architectural decisions and implementation practices across the Flutter team, providing technical guidance and conducting code reviews to maintain code quality and consistency.',
+      'Developed and maintained 3+ cross-platform Flutter applications for financial products, supporting multi-client integrations and white-label deployments.',
+      'Developed Flutter SDKs and maintained shared Dart/Flutter libraries, enabling code reuse and consistent implementations across applications.',
+      'Applied BLoC and Clean Architecture principles to build modular, maintainable, and testable application codebases.',
+      'Integrated REST APIs, WebSockets, and Firebase services for backend communication, real-time market data, and push notifications.',
+      'Profiled and optimized Flutter application performance, addressing rendering, gesture handling, and responsiveness challenges in complex interfaces.',
+      'Integrated native Android SDK components into Flutter applications to support platform-specific functionality.',
+      'Contributed to automated testing and CI/CD workflows, using Azure Pipelines and GitHub Actions for Flutter builds, signing, and application releases.',
     ],
     platforms: [
       ProductionPlatform(
         name: 'NeoCharts',
         subtitle: 'Precision Charting Infrastructure & SDK',
-        description: 'Mobile-native, white-label precision charting platform and SDK for stockbrokers. Features 60fps canvas rendering, one-click order placement from charts, visual stop-loss/target, and real-time streaming P&L across Android, iOS, and Web.',
+        description: 'Flutter charting SDK for financial trading platforms, featuring 60fps canvas rendering, technical indicators, interactive charts, and real-time market data streaming.',
         techStack: [
           'Flutter',
           'Canvas Rendering',
@@ -173,7 +174,7 @@ const jobs = [
       ProductionPlatform(
         name: 'NxtOption',
         subtitle: 'Options Trading Platform & SDK',
-        description: 'Dedicated options trading platform developed for React web and Flutter mobile. Features interactive Strategy Builder, real-time OI/PCR analytics charts, and a client trading SDK with deterministic WebSocket reconnection.',
+        description: 'Options trading platform with real-time option-chain data, strategy analysis, interactive trading workflows, and a client trading SDK with deterministic WebSocket reconnection.',
         techStack: [
           'Flutter',
           'ReactJS',
@@ -196,6 +197,17 @@ const jobs = [
           'Deep Linking',
         ],
       ),
+    ],
+  ),
+  Job(
+    role: 'Software Engineering Intern',
+    company: 'IOURING Private Limited',
+    period: 'Jan 2022 — Sep 2022',
+    location: 'Chennai, India',
+    isCurrent: false,
+    bulletPoints: [
+      'Developed and maintained 2+ web applications using React, Redux, and Material UI.',
+      'Helped build Flutter UI components and integrate backend REST APIs.',
     ],
   ),
 ];
@@ -252,35 +264,38 @@ const capabilityGroups = [
   ),
   CapabilityGroup(
     index: '02',
-    title: 'Architecture & SDK Engineering',
+    title: 'Architecture & Mobile Systems',
     bullets: [
       'Clean Architecture',
+      'BLoC',
       'Modularization',
       'Monorepos (Melos)',
-      'SDKs',
-      'BLoC',
+      'SDK Development',
     ],
     accentColor: Color(0xFF5856D6), // Apple Indigo
   ),
   CapabilityGroup(
     index: '03',
-    title: 'Backend & Integration',
-    bullets: ['Firebase', 'WebSockets', 'REST API'],
+    title: 'Networking & Integration',
+    bullets: ['REST APIs', 'WebSockets', 'Firebase'],
     accentColor: Color(0xFF28CD41), // Apple Emerald
   ),
   CapabilityGroup(
     index: '04',
     title: 'AI Tooling & Workflows',
-    bullets: ['AI SDLC', 'Local LLMs', 'Ollama', 'MCP', 'Agent Skills'],
+    bullets: ['AI-assisted SDLC', 'Local LLMs', 'Ollama', 'MCP', 'Agent Skills'],
     accentColor: Color(0xFFFF9500), // Apple Amber
   ),
   CapabilityGroup(
     index: '05',
     title: 'Testing & Delivery',
     bullets: [
+      'Git',
       'Integration Testing',
       'Patrol',
-      'Azure CI/CD',
+      'Azure Pipelines',
+      'GitHub Actions',
+      'Build Automation',
       'App Store Releases',
     ],
     accentColor: Color(0xFF30B0C7), // Apple Teal

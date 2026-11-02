@@ -89,19 +89,20 @@ class TimelineItem extends StatelessWidget {
                     // Role, Location, Period, and Current Highlight Badge
                     _buildHeader(context),
 
-                    const SizedBox(height: 12),
-
-                    // Summary
-                    Text(
-                      job.summary,
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Palette.textSecondary,
-                        height: 1.55,
+                    if (job.summary != null && job.summary!.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      // Summary
+                      Text(
+                        job.summary!,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: Palette.textSecondary,
+                          height: 1.55,
+                        ),
                       ),
-                    ),
+                    ],
 
                     const SizedBox(height: 14),
 
