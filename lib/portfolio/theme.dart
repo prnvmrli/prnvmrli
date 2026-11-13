@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Apple-inspired design tokens for Pranav Murali's portfolio.
 /// Clean, warm off-white canvas, near-black typography, neutral grey secondary

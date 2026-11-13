@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Staggered entrance fade & vertical slide reveal animation.
 class FadeSlideReveal extends StatefulWidget {
